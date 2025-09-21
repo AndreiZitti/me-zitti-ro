@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personal Portfolio</title>
+    <link rel="stylesheet" href="main/css/styles.css" />
+  </head>
+  <body>
+    <div class="main-container">
+      <header class="main-header">
+        <h1>Welcome to My Digital Universe</h1>
+        <p>Explore my projects and interests</p>
+      </header>
+
+      <main class="portfolio-grid">
+        <div class="portfolio-item" data-target="star-map">
+          <div class="portfolio-card">
+            <img src="main/assets/telescope.jpg" alt="Star Map" />
+            <div class="card-overlay">
+              <h3>Star Map</h3>
+              <p>Interactive constellation explorer</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="portfolio-item" data-target="book-library">
+          <div class="portfolio-card">
+            <img src="main/assets/library.jpg" alt="Book Library" />
+            <div class="card-overlay">
+              <h3>Book Library</h3>
+              <p>3D showcase of my book collection</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="portfolio-item" data-target="contact-me">
+          <div class="portfolio-card">
+            <img src="main/assets/person.jpg" alt="Contact Me" />
+            <div class="card-overlay">
+              <h3>Contact Me</h3>
+              <p>Get in touch and learn about me</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="portfolio-item" data-target="sailing">
+          <div class="portfolio-card">
+            <img src="main/assets/boat.jpg" alt="Sailing" />
+            <div class="card-overlay">
+              <h3>Sailing Adventures</h3>
+              <p>My journey on the open waters</p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="portfolio-item"
+          data-target="external"
+          data-url="https://github.com"
+        >
+          <div class="portfolio-card">
+            <img src="main/assets/computer.png" alt="Code" />
+            <div class="card-overlay">
+              <h3>GitHub</h3>
+              <p>View my code repositories</p>
+              <span class="external-icon">↗</span>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="main-footer">
+        <p>&copy; 2024 Personal Portfolio. All rights reserved.</p>
+      </footer>
+    </div>
+
+    <script src="main/js/navigation.js"></script>
+  </body>
+</html>

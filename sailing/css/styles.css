@@ -1,0 +1,427 @@
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Arial", sans-serif;
+  background: linear-gradient(180deg, #0077be 0%, #4a90e2 50%, #87ceeb 100%);
+  min-height: 100vh;
+  color: #fff;
+  line-height: 1.6;
+}
+
+/* Container */
+.sailing-container {
+  min-height: 100vh;
+}
+
+/* Header */
+.sailing-header {
+  position: relative;
+  height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+.header-content {
+  z-index: 2;
+  position: relative;
+  padding: 0 20px;
+}
+
+.sailing-header h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(45deg, #fff, #e3f2fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sailing-header p {
+  font-size: 1.3rem;
+  opacity: 0.95;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Wave Animation */
+.wave-animation {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="rgba(255,255,255,0.1)"></path></svg>')
+    repeat-x;
+  animation: wave 10s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-50px);
+  }
+}
+
+/* Content */
+.sailing-content {
+  padding: 60px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Intro Section */
+.intro-section {
+  margin-bottom: 80px;
+  text-align: center;
+}
+
+.intro-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 800px;
+  margin: 0 auto;
+  transition: all 0.3s ease;
+}
+
+.intro-card:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-5px);
+}
+
+.intro-card h2 {
+  font-size: 2.2rem;
+  margin-bottom: 25px;
+  color: #fff;
+}
+
+.intro-card p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  line-height: 1.8;
+}
+
+/* Adventures Grid */
+.adventures-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
+  margin-bottom: 80px;
+}
+
+.adventure-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.adventure-card:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+  padding: 25px 25px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.card-header h3 {
+  font-size: 1.4rem;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.date {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.card-content {
+  padding: 20px 25px 25px;
+}
+
+.card-content p {
+  opacity: 0.9;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.stat strong {
+  color: #fff;
+  opacity: 1;
+}
+
+/* Skills Section */
+.skills-section {
+  margin-bottom: 80px;
+}
+
+.skills-section h2 {
+  font-size: 2.2rem;
+  text-align: center;
+  margin-bottom: 50px;
+  color: #fff;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+.skill-item {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 30px 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.skill-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-5px);
+}
+
+.skill-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.skill-item h4 {
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+.skill-item p {
+  opacity: 0.9;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Philosophy Section */
+.philosophy-section {
+  margin-bottom: 60px;
+  text-align: center;
+}
+
+.quote-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 40px;
+  margin-bottom: 40px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.quote-card blockquote {
+  font-size: 1.4rem;
+  font-style: italic;
+  margin-bottom: 20px;
+  color: #fff;
+  line-height: 1.6;
+}
+
+.quote-card cite {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.philosophy-text {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.philosophy-text h3 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.philosophy-text p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  line-height: 1.8;
+}
+
+/* Footer */
+.sailing-footer {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 30px 20px;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.footer-content p {
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sailing-header {
+    height: 50vh;
+    padding: 0 15px;
+  }
+
+  .sailing-header h1 {
+    font-size: 2.5rem;
+  }
+
+  .sailing-header p {
+    font-size: 1.1rem;
+  }
+
+  .sailing-content {
+    padding: 40px 15px;
+  }
+
+  .intro-card {
+    padding: 25px;
+  }
+
+  .intro-card h2 {
+    font-size: 1.8rem;
+  }
+
+  .adventures-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .skills-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .skill-item {
+    padding: 25px 15px;
+  }
+
+  .quote-card {
+    padding: 25px;
+  }
+
+  .quote-card blockquote {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sailing-header h1 {
+    font-size: 2rem;
+  }
+
+  .intro-card {
+    padding: 20px;
+  }
+
+  .intro-card h2 {
+    font-size: 1.6rem;
+  }
+
+  .skills-section h2 {
+    font-size: 1.8rem;
+  }
+
+  .philosophy-text h3 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Animation for page load */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sailing-content > * {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.adventures-grid .adventure-card {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.adventures-grid .adventure-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.adventures-grid .adventure-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.adventures-grid .adventure-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.adventures-grid .adventure-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.skills-grid .skill-item {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.skills-grid .skill-item:nth-child(1) {
+  animation-delay: 0.2s;
+}
+.skills-grid .skill-item:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.skills-grid .skill-item:nth-child(3) {
+  animation-delay: 0.4s;
+}
+.skills-grid .skill-item:nth-child(4) {
+  animation-delay: 0.5s;
+}

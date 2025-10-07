@@ -9,7 +9,7 @@
     "build": "npm run build:css && npm run build:js && npm run build:assets",
     "build:css": "postcss main/css/*.css --dir dist/css --use autoprefixer cssnano",
     "build:js": "terser main/js/*.js --compress --mangle --output dist/js/bundle.min.js",
-    "build:assets": "cpx 'main/assets/**/*' dist/assets && cpx 'main/*.html' dist/",
+    "build:assets": "cpx 'main/assets/**/*' dist/assets && cpx 'main/*.html' dist/ && cpx 'book-library/**/*' dist/book-library && cpx 'contact-me/**/*' dist/contact-me && cpx 'star-map/**/*' dist/star-map && cpx 'sailing/**/*' dist/sailing",
     "preview": "live-server dist --port=3001 --open",
     "lint": "eslint main/js/*.js",
     "lint:fix": "eslint main/js/*.js --fix",

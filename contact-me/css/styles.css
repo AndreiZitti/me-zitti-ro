@@ -26,6 +26,34 @@ body {
   text-align: center;
   margin-bottom: 60px;
   padding-top: 40px;
+  position: relative;
+}
+
+/* Back Navigation */
+.back-nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-bottom: 20px;
+}
+
+.back-link {
+  display: inline-block;
+  color: #fff;
+  text-decoration: none;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.back-link:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .contact-header h1 {

@@ -1,6 +1,6 @@
-# Personal Portfolio Website
+# Azitti Portfolio - Interactive Particle Animation Website
 
-A comprehensive portfolio website showcasing projects and interests in astronomy, literature, sailing, and web development.
+A comprehensive portfolio website featuring particle-to-object animations and showcasing projects and interests in astronomy, literature, sailing, and web development.
 
 ## 🌟 Projects Overview
 
@@ -48,33 +48,107 @@ Direct links to external repositories and profiles.
 
 ## 🚀 Quick Start
 
-1. **Local Development**:
+### Prerequisites
+- **Node.js** (v16.0.0 or higher)
+- **npm** (v8.0.0 or higher)
+
+### Installation & Development
+
+1. **Clone and Setup**:
 
    ```bash
-   # Clone and navigate to project
-   cd PersonalWebsite
+   # Clone the repository
+   git clone <repository-url>
+   cd azitti
 
-   # Start local server
-   python3 -m http.server 8000
+   # Install dependencies
+   npm install
 
-   # Visit http://localhost:8000
+   # Start development server with live reload
+   npm start
    ```
 
-2. **Navigation**:
-   - Main page: Beautiful landing page with project cards
-   - Click any card to explore that project
-   - Use "Back to Main" buttons or ESC key to return
-   - External links open in new tabs
+   This opens the particle animation website at `http://localhost:3000`
+
+2. **Alternative Development**:
+
+   ```bash
+   # Using simple HTTP server
+   npm run serve
+
+   # Or traditional Python server (no live reload)
+   python3 -m http.server 8000
+   ```
+
+3. **Production Build**:
+
+   ```bash
+   # Build optimized version
+   npm run build
+
+   # Preview production build
+   npm run preview
+   ```
+
+### Navigation
+- **Main Animation**: Scroll-triggered particle-to-object transformations
+- **Interactive Objects**: Click laptop, bookshelf, or telescope to explore sections
+- **Keyboard**: Tab navigation, Enter/Space activation, ESC to return
+- **Mobile**: Touch-friendly responsive design
+
+## 🎨 Particle Animation Features
+
+### ✨ Main Animation Sequence
+1. **Boring Intro** (0-25% scroll) - Simple text introduction
+2. **Background Formation** (25-35% scroll) - Particles cluster and background fades in
+3. **Laptop Formation** (40-45% scroll) - Particles form laptop outline
+4. **Bookshelf Formation** (55-60% scroll) - Complex multi-shelf particle arrangement
+5. **Telescope Formation** (70-75% scroll) - Cylindrical particle formation
+6. **Scene Completion** (85%+ scroll) - All objects become interactive
+
+### ⚡ Performance Features
+- **Device Detection**: Automatic performance level assessment (high/medium/low)
+- **Dynamic Optimization**: Real-time FPS monitoring and particle count adjustment
+- **GPU Acceleration**: CSS transforms for smooth 60fps animations
+- **Memory Management**: Object pooling and efficient resource cleanup
+- **Accessibility**: Reduced motion support and keyboard navigation
+
+## 📜 Available NPM Scripts
+
+### Development
+- `npm start` or `npm run dev` - Start development server with live reload
+- `npm run serve` - Alternative HTTP server
+
+### Production
+- `npm run build` - Build optimized production version
+- `npm run preview` - Preview production build locally
+- `npm run clean` - Clean build directory
+
+### Code Quality
+- `npm run lint` - Run ESLint on JavaScript files
+- `npm run lint:fix` - Fix ESLint issues automatically
+- `npm run format` - Format code with Prettier
+- `npm run validate` - Run linting and formatting checks
 
 ## 📁 Project Structure
 
 ```
-PersonalWebsite/
-├── index.html                 # Main landing page
-├── main/                      # Main app assets and navigation
-│   ├── assets/               # Project thumbnails
-│   ├── css/styles.css        # Main styling
-│   └── js/navigation.js      # Navigation logic
+azitti/
+├── package.json               # NPM project configuration
+├── main/                      # Particle animation website
+│   ├── index.html            # Main HTML with particle canvas
+│   ├── assets/               # Animation assets (background, objects)
+│   │   └── main_animation/   # PNG files for particle-to-object formation
+│   ├── css/                  # Stylesheets
+│   │   ├── main.css         # Base styles and responsive design
+│   │   ├── particles.css    # Particle system styling
+│   │   └── animations.css   # GSAP animation definitions
+│   └── js/                   # JavaScript modules
+│       ├── main.js          # Application controller
+│       ├── particles.js     # Canvas-based particle system (300 particles)
+│       ├── scroll-controller.js # GSAP ScrollTrigger integration
+│       ├── object-formation.js  # Particle-to-object transformation logic
+│       └── performance.js   # Performance monitoring and optimization
 ├── star-map/                 # Interactive star map
 │   ├── index.html
 │   ├── css/styles.css
@@ -118,11 +192,26 @@ PersonalWebsite/
 
 ## 🛠️ Technologies Used
 
-- **Frontend**: Pure HTML5, CSS3, JavaScript (ES6+)
-- **Styling**: CSS Grid, Flexbox, CSS3 Animations
-- **Interactive**: Canvas API (Star Map), DOM manipulation
-- **Responsive**: Mobile-first responsive design
-- **Performance**: Optimized images, efficient animations
+### Core Animation Stack
+- **JavaScript**: Vanilla ES6+ with classes and modules
+- **Animation**: GSAP 3.12+ with ScrollTrigger plugin
+- **Graphics**: HTML5 Canvas API for particle rendering
+- **Styling**: CSS3 with Grid, Flexbox, and transforms
+- **Performance**: RequestAnimationFrame with FPS monitoring
+
+### Development Tools
+- **Build**: PostCSS with Autoprefixer and CSSnano
+- **Minification**: Terser for JavaScript compression
+- **Development**: Live Server with hot reload
+- **Code Quality**: ESLint and Prettier
+- **Package Management**: NPM with modern scripts
+
+### Browser APIs
+- **Canvas**: 2D context for particle rendering
+- **Intersection Observer**: Viewport-based optimizations
+- **Device Memory API**: Performance level detection
+- **Reduced Motion**: Accessibility preferences
+- **WebGL**: Optional GPU detection for capability assessment
 
 ## 📱 Browser Support
 

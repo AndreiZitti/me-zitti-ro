@@ -1,0 +1,56 @@
+{
+  "name": "azitti-portfolio",
+  "version": "1.0.0",
+  "description": "Interactive particle-to-object animation portfolio website",
+  "main": "main/index.html",
+  "scripts": {
+    "dev": "live-server . --port=3000 --open",
+    "start": "npm run dev",
+    "build": "npm run build:css && npm run build:js && npm run build:assets",
+    "build:css": "postcss main/css/*.css --dir dist/css --use autoprefixer cssnano",
+    "build:js": "terser main/js/*.js --compress --mangle --output dist/js/bundle.min.js",
+    "build:assets": "cpx 'main/assets/**/*' dist/assets && cpx 'main/*.html' dist/",
+    "preview": "live-server dist --port=3001 --open",
+    "lint": "eslint main/js/*.js",
+    "lint:fix": "eslint main/js/*.js --fix",
+    "format": "prettier --write 'main/**/*.{html,css,js}'",
+    "clean": "rimraf dist",
+    "serve": "http-server main -p 3000 -o",
+    "test": "echo \"No tests specified\" && exit 0",
+    "validate": "npm run lint && npm run format --check"
+  },
+  "keywords": [
+    "portfolio",
+    "animation",
+    "particles",
+    "gsap",
+    "interactive",
+    "canvas",
+    "javascript"
+  ],
+  "author": "Azitti",
+  "license": "MIT",
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "cpx": "^1.5.0",
+    "cssnano": "^6.0.1",
+    "eslint": "^8.55.0",
+    "http-server": "^14.1.1",
+    "live-server": "^1.2.2",
+    "postcss": "^8.4.32",
+    "postcss-cli": "^11.0.0",
+    "prettier": "^3.1.0",
+    "rimraf": "^5.0.5",
+    "terser": "^5.26.0"
+  },
+  "dependencies": {},
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}

@@ -248,6 +248,11 @@ class BookLibrary {
     const bookItem = document.createElement("li");
     const pageContent = this.generateBookPages(book);
 
+    // Randomize book dimensions for variety
+    const height = 360 + Math.random() * 80; // 360-440px
+    const spineWidth = 30 + Math.random() * 25; // 30-55px
+    const bookDepth = 250 + Math.random() * 100; // 250-350px
+
     bookItem.innerHTML = `
       <div class="bk-book book-${book.category}" data-opened="false">
         <div class="bk-front">
@@ -271,24 +276,68 @@ class BookLibrary {
           <p>${book.description}</p>
         </div>
         <div class="bk-right"></div>
-        <div class="bk-left">
-          <h2>
-            <span>${book.author}</span>
-            <span>${book.title}</span>
-          </h2>
-        </div>
+        <div class="bk-left"></div>
         <div class="bk-top"></div>
         <div class="bk-bottom"></div>
       </div>
     `;
 
-    // Set z-index for proper stacking
+    // Apply randomized dimensions
+    bookItem.style.width = `${spineWidth}px`;
+    bookItem.style.height = `${height}px`;
+
+    const bookEl = bookItem.querySelector(".bk-book");
+    bookEl.style.height = `${height}px`;
+
+    // Apply dimensions to various book parts
+    const frontBackCover = bookItem.querySelectorAll(".bk-front, .bk-back, .bk-front > div");
+    frontBackCover.forEach(el => {
+      el.style.width = `${bookDepth}px`;
+      el.style.height = `${height}px`;
+    });
+
+    // Fix front cover position to match spine width
+    const bkFront = bookItem.querySelector(".bk-front");
+    bkFront.style.transform = `translate3d(0, 0, ${spineWidth / 2}px)`;
+
+    // Fix back cover position
+    const bkBack = bookItem.querySelector(".bk-back");
+    bkBack.style.transform = `rotate3d(0, 1, 0, -180deg) translate3d(0, 0, ${spineWidth / 2}px)`;
+
+    const leftRight = bookItem.querySelectorAll(".bk-left, .bk-right");
+    leftRight.forEach(el => {
+      el.style.width = `${spineWidth}px`;
+      el.style.left = `-${spineWidth / 2}px`;
+    });
+
+    const bkLeft = bookItem.querySelector(".bk-left");
+    bkLeft.style.height = `${height}px`;
+
+    const bkRight = bookItem.querySelector(".bk-right");
+    bkRight.style.height = `${height - 10}px`;
+    bkRight.style.transform = `rotate3d(0, 1, 0, 90deg) translate3d(0, 0, ${bookDepth - 5}px)`;
+
+    const topBottom = bookItem.querySelectorAll(".bk-top, .bk-bottom");
+    topBottom.forEach(el => {
+      el.style.width = `${bookDepth - 5}px`;
+      el.style.height = `${spineWidth}px`;
+    });
+
+    const bkBottom = bookItem.querySelector(".bk-bottom");
+    bkBottom.style.transform = `rotate3d(1, 0, 0, -90deg) translate3d(0, 0, ${height - 10}px)`;
+
+    const bkPage = bookItem.querySelector(".bk-page");
+    bkPage.style.width = `${bookDepth - 5}px`;
+    bkPage.style.height = `${height - 10}px`;
+    bkPage.style.transform = `translate3d(0, 0, ${spineWidth / 2 - 1}px)`;
+
+    // Set z-index for proper stacking (keep books above shelf)
     const totalBooks = this.books.length;
     if (globalIndex < totalBooks / 2) {
-      bookItem.style.zIndex = globalIndex;
-      bookItem.setAttribute("data-stackval", globalIndex);
+      bookItem.style.zIndex = 10 + globalIndex;
+      bookItem.setAttribute("data-stackval", 10 + globalIndex);
     } else {
-      const stackVal = totalBooks - 1 - globalIndex;
+      const stackVal = 10 + totalBooks - 1 - globalIndex;
       bookItem.style.zIndex = stackVal;
       bookItem.setAttribute("data-stackval", stackVal);
     }
@@ -417,7 +466,7 @@ class BookLibrary {
       bookEl.removeEventListener(this.transEndEventName, openHandler);
       bookEl._openTransitionHandler = null;
       bookEl.classList.add("bk-viewinside");
-      bookItem.style.zIndex = totalBooks + 10;
+      bookItem.style.zIndex = totalBooks + 100;
       this.isTransitioning = false;
     }.bind(this);
 

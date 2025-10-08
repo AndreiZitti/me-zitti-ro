@@ -11,47 +11,66 @@
     />
     <link rel="stylesheet" type="text/css" href="css/default.css" />
     <link rel="stylesheet" type="text/css" href="css/library.css" />
+
+    <!-- Three.js Import Map -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+        }
+      }
+    </script>
   </head>
   <body>
-    <div class="container">
-      <header class="clearfix">
-        <h1>My Book Library</h1>
-        <nav class="main-nav">
-          <a href="/index.html" class="admin-link">← Back to Terminal</a>
-          <a href="admin.html" class="admin-link">📚 Manage Books</a>
-        </nav>
-      </header>
+    <!-- Fullscreen Three.js Canvas Container -->
+    <div id="bookshelf-3d-container"></div>
 
-      <div class="filter-controls">
-        <div class="filter-section">
-          <label for="categoryFilter">Filter by Genre:</label>
-          <select id="categoryFilter" multiple>
-            <option value="all" selected>All Books</option>
-            <option value="science">Science</option>
-            <option value="horror">Horror</option>
-            <option value="dystopian">Dystopian</option>
-            <option value="ai">AI & Technology</option>
-            <option value="self-help">Self-Help</option>
-            <option value="business">Business</option>
-          </select>
-          <button id="clearFilters">Clear All</button>
-        </div>
-        <div class="sort-section">
-          <button class="sort-btn active" data-sort="title">
-            Sort by Title
-          </button>
-          <button class="sort-btn" data-sort="author">Sort by Author</button>
-          <button class="sort-btn" data-sort="genre">Sort by Genre</button>
-        </div>
+    <!-- Header overlay (top) -->
+    <div class="header-overlay">
+      <h1>My Book Library</h1>
+      <nav class="main-nav">
+        <a href="/index.html" class="admin-link">← Terminal</a>
+        <a href="admin.html" class="admin-link">📚 Manage</a>
+      </nav>
+    </div>
+
+    <!-- Filter controls overlay (top-right) -->
+    <div class="filter-controls-overlay">
+      <div class="filter-section">
+        <label for="categoryFilter">Filter:</label>
+        <select id="categoryFilter" multiple>
+          <option value="all" selected>All Books</option>
+          <option value="science">Science</option>
+          <option value="horror">Horror</option>
+          <option value="dystopian">Dystopian</option>
+          <option value="ai">AI & Technology</option>
+          <option value="self-help">Self-Help</option>
+          <option value="business">Business</option>
+        </select>
+        <button id="clearFilters">Clear</button>
       </div>
+      <div class="sort-section">
+        <button class="sort-btn active" data-sort="title">Title</button>
+        <button class="sort-btn" data-sort="author">Author</button>
+        <button class="sort-btn" data-sort="genre">Genre</button>
+      </div>
+    </div>
 
-      <div class="main">
-        <div id="dynamic-shelves-container">
-          <!-- Dynamic shelves will be generated here -->
-        </div>
+    <!-- Book details overlay -->
+    <div id="book-details-overlay" class="book-overlay" style="display: none;">
+      <div class="book-details-content">
+        <button id="close-book-details" class="close-btn">&times;</button>
+        <h2 id="detail-title"></h2>
+        <p id="detail-author"></p>
+        <p id="detail-genre"></p>
+        <p id="detail-rating"></p>
+        <blockquote id="detail-quote"></blockquote>
+        <p id="detail-description"></p>
       </div>
     </div>
 
     <script src="js/bookLibrary.js"></script>
+    <script type="module" src="js/bookshelf3D.js"></script>
   </body>
 </html>

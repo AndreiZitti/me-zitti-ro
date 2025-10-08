@@ -612,6 +612,14 @@ class BookLibrary {
     const filteredBooks = this.filterBooks();
     const sortedBooks = this.sortBooks(filteredBooks);
 
+    // Update Three.js display if available
+    if (window.bookshelf3D) {
+      window.bookshelf3D.refreshDisplay(sortedBooks);
+    }
+
+    // === OLD CSS 3D RENDERING CODE (No longer used - Three.js handles rendering) ===
+    // Keeping this code commented for reference/rollback purposes
+    /*
     // Clear all existing shelves
     this.clearAllShelves();
 
@@ -643,6 +651,7 @@ class BookLibrary {
         });
       }
     }
+    */
   }
 
   setupEventListeners() {
@@ -713,5 +722,5 @@ class BookLibrary {
 
 // Initialize the library when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
-  new BookLibrary();
+  window.bookLibrary = new BookLibrary();
 });

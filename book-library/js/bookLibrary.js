@@ -10,7 +10,7 @@ class BookLibrary {
     this.currentSort = "title";
     this.transEndEventName = this.getTransitionEndEvent();
     this.isTransitioning = false;
-    this.booksPerShelf = 6; // Maximum books per shelf
+    this.booksPerShelf = 30; // Maximum books per shelf
     this.currentShelfCount = 0;
 
     this.init();
@@ -36,6 +36,7 @@ class BookLibrary {
             "However difficult life may seem, there is always something you can do and succeed at.",
           description:
             "Stephen Hawking's final book addresses the biggest questions facing humanity.",
+          coverImageURL: "assets/books/cover/COVER_BABQ.jpg"
         },
         {
           id: 2,
@@ -60,6 +61,7 @@ class BookLibrary {
             "If time travel is possible, where are the tourists from the future?",
           description:
             "The landmark volume on the frontier of scientific knowledge.",
+          coverImageURL: "https://covers.openlibrary.org/b/id/7984916-L.jpg"
         },
         {
           id: 4,
@@ -105,6 +107,7 @@ class BookLibrary {
           quote: "War is peace. Freedom is slavery. Ignorance is strength.",
           description:
             "A dystopian masterpiece about totalitarian control and surveillance.",
+          coverImageURL: "assets/books/cover/COVER_1984.jpeg"
         },
         {
           id: 8,
@@ -181,6 +184,7 @@ class BookLibrary {
             "Goals are about the results you want. Systems are about the processes that lead to those results.",
           description:
             "A practical framework for building good habits and breaking bad ones through small, incremental changes.",
+          coverImageURL: "https://covers.openlibrary.org/b/id/12583335-L.jpg"
         },
       ];
 

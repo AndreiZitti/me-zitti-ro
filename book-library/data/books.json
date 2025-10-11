@@ -6,8 +6,9 @@
     "genre": "Science, Non-fiction",
     "category": "science",
     "rating": "9/10",
-    "quote": "We are just an advanced breed of monkeys on a minor planet of a very average star. But we can understand the universe. That makes us something very special.",
-    "description": "Hawking's final gift to humanity—a brilliant mind's last thoughts on existence, artificial intelligence, and whether we're alone. Reading this feels like having a conversation with one of history's greatest thinkers about the questions that keep you awake at night."
+    "quote": "However difficult life may seem, there is always something you can do and succeed at.",
+    "description": "Stephen Hawking's final book addresses the biggest questions facing humanity.",
+    "coverImageURL": "assets/books/cover/COVER_BABQ.jpg"
   },
   {
     "id": 2,
@@ -16,8 +17,8 @@
     "genre": "Science, Physics",
     "category": "science",
     "rating": "8/10",
-    "quote": "The universe doesn't allow perfection.",
-    "description": "A mind-bending sequel that somehow makes quantum mechanics and relativity feel accessible. Hawking's gift for turning the impossible into the inevitable shines here—you'll finish this book feeling like you've glimpsed the universe's deepest secrets through the eyes of a genius."
+    "quote": "Imaginary time is a new dimension, at right angles to ordinary, real time.",
+    "description": "A journey through the universe's most fascinating concepts in physics."
   },
   {
     "id": 3,
@@ -26,8 +27,9 @@
     "genre": "Science, Cosmology",
     "category": "science",
     "rating": "10/10",
-    "quote": "My goal is simple. It is a complete understanding of the universe, why it is as it is and why it exists at all.",
-    "description": "The book that made cosmology cool and turned Stephen Hawking into a household name. This isn't just science—it's philosophy disguised as physics. Every page challenges you to think bigger about time, space, and your place in the cosmic story."
+    "quote": "If time travel is possible, where are the tourists from the future?",
+    "description": "The landmark volume on the frontier of scientific knowledge.",
+    "coverImageURL": "https://covers.openlibrary.org/b/id/7984916-L.jpg"
   },
   {
     "id": 4,
@@ -36,8 +38,8 @@
     "genre": "Horror, Fiction",
     "category": "horror",
     "rating": "9/10",
-    "quote": "Maybe there aren't any such things as good friends or bad friends—maybe there are just friends, people who stand by you when you're hurt and who help you feel not so lonely.",
-    "description": "Disguised as a monster story, this is actually King's masterpiece about childhood, memory, and the terrible things we survive. IT isn't just about a clown—it's about the monsters we face growing up and the friends who help us face them. Brutal, beautiful, and unforgettable."
+    "quote": "We all float down here.",
+    "description": "A terrifying tale of seven kids who face their worst nightmare."
   },
   {
     "id": 5,
@@ -46,8 +48,8 @@
     "genre": "Horror, Post-apocalyptic",
     "category": "horror",
     "rating": "9/10",
-    "quote": "The world had teeth and it could bite you with them anytime it wanted.",
-    "description": "King's sprawling epic about what happens when civilization crumbles and we're forced to choose sides between good and evil. More than a plague story—it's a meditation on human nature, faith, and whether we're worth saving. The characters will haunt you long after the last page."
+    "quote": "The place where you made your stand never mattered. Only that you were there... and still on your feet.",
+    "description": "An epic tale of good vs. evil in a post-apocalyptic world."
   },
   {
     "id": 6,
@@ -56,8 +58,8 @@
     "genre": "Horror, Thriller",
     "category": "horror",
     "rating": "8/10",
-    "quote": "Grief was the celebration of love, that was what they never told you. Grief and love are conjoined, you don't get one without the other.",
-    "description": "King's most disturbing work because it taps into the one fear every parent carries—what we'd do to bring back what we've lost. This isn't horror for horror's sake; it's a devastating exploration of love, loss, and the terrible choices grief makes us consider."
+    "quote": "Sometimes dead is better.",
+    "description": "A chilling story about the boundaries between life and death."
   },
   {
     "id": 7,
@@ -66,8 +68,49 @@
     "genre": "Dystopian, Political fiction",
     "category": "dystopian",
     "rating": "10/10",
-    "quote": "The Party told you to reject the evidence of your eyes and ears. It was their final, most essential command.",
-    "description": "The most terrifying book ever written because it feels less like fiction every year. Orwell didn't just predict the future—he gave us the vocabulary to understand it. Every time you hear 'alternative facts' or 'fake news,' you're living in Winston Smith's world."
+    "quote": "War is peace. Freedom is slavery. Ignorance is strength.",
+    "description": "A dystopian masterpiece about totalitarian control and surveillance.",
+    "coverImageURL": "assets/books/cover/COVER_1984.jpeg"
+  },
+  {
+    "id": 8,
+    "title": "These Strange New Minds: How AI Learned to Talk and What It Means",
+    "author": "Christopher Summerfield",
+    "genre": "AI, Cognitive Science, Technology History",
+    "category": "ai",
+    "rating": "8/10",
+    "quote": "AI chatbots are error‑prone prediction engines that differ from humans in crucial ways.",
+    "description": "An exploration of how artificial intelligence developed language capabilities and its implications for humanity."
+  },
+  {
+    "id": 9,
+    "title": "Future‑Proof Yourself: An AI Era Survival Guide",
+    "author": "Taehoon Kim",
+    "genre": "AI, Popular Science",
+    "category": "ai",
+    "rating": "8/10",
+    "quote": "Designed for a general audience, the text avoids heavy technical jargon and presents complex ideas in clear, straightforward language.",
+    "description": "A practical guide to thriving in an age of artificial intelligence and technological disruption."
+  },
+  {
+    "id": 10,
+    "title": "Probabilistic Artificial Intelligence",
+    "author": "Andreas Krause & Jonas Hübotter",
+    "genre": "Machine Learning, Probabilistic Methods",
+    "category": "ai",
+    "rating": "8/10",
+    "quote": "A key aspect of intelligence is to not only make predictions, but reason about the uncertainty in these predictions.",
+    "description": "Advanced concepts in probabilistic approaches to artificial intelligence and machine learning."
+  },
+  {
+    "id": 11,
+    "title": "The Coming Wave: Technology, Power, and the Twenty‑first Century's Greatest Dilemma",
+    "author": "Mustafa Suleyman & Michael Bhaskar",
+    "genre": "AI Ethics, Risk, Policy",
+    "category": "ai",
+    "rating": "8/10",
+    "quote": "The same technologies that allow us to cure a disease could be used to cause one.",
+    "description": "An examination of emerging technologies and their potential risks and benefits for society."
   },
   {
     "id": 12,
@@ -76,8 +119,8 @@
     "genre": "Product Management, UX Research, Business Strategy",
     "category": "business",
     "rating": "9/10",
-    "quote": "The goal of discovery is not to prove that we are right, but to quickly discover when we are wrong.",
-    "description": "The product management book I wish I'd had years ago. Torres doesn't just tell you what to do—she shows you how to build a sustainable practice of actually understanding your customers. It's the difference between guessing what people want and knowing what they need."
+    "quote": "If you haven't had the good fortune to be coached by a strong leader or product coach, this book can help fill that gap and set you on the path to success.",
+    "description": "A comprehensive guide to building customer-centric products through continuous discovery practices."
   },
   {
     "id": 13,
@@ -86,67 +129,8 @@
     "genre": "Self‑Help, Behavioural Science, Productivity",
     "category": "self-help",
     "rating": "9/10",
-    "quote": "You do not rise to the level of your goals. You fall to the level of your systems.",
-    "description": "The most practical self-help book I've ever read. Clear doesn't promise overnight transformation—instead, he shows you how tiny changes compound into remarkable results. This book doesn't just change how you think about habits; it changes how you think about change itself."
-  },
-  {
-    "id": 14,
-    "title": "The Mom Test: How to talk to customers & learn if your business is a good idea when everyone is lying to you",
-    "author": "Rob Fitzpatrick",
-    "genre": "Entrepreneurship, Customer Development, Business Strategy",
-    "category": "business",
-    "rating": "9/10",
-    "quote": "The Mom Test is a set of simple rules for crafting good questions that even your mom can't lie to you about.",
-    "description": "The brutally honest guide that destroys every comfortable lie entrepreneurs tell themselves about customer validation. Fitzpatrick strips away the politeness and teaches you how to have conversations that actually matter. This book will make you cringe at every 'great idea!' you've received—and show you how to find the truth instead."
-  },
-  {
-    "id": 15,
-    "title": "Homo Deus: A Brief History of Tomorrow",
-    "author": "Yuval Noah Harari",
-    "genre": "History, Philosophy, Futurism",
-    "category": "philosophy",
-    "rating": "8/10",
-    "quote": "We are probably one of the last generations of homo sapiens. Within a century or two, Earth will be dominated by entities that are more different from us than we are different from Neanderthals.",
-    "description": "Harari's follow-up to Sapiens is both exhilarating and terrifying—a roadmap to humanity's potential future that reads like science fiction but feels inevitable. He forces you to confront uncomfortable questions about consciousness, free will, and whether we're creating our successors. Brilliant, unsettling, and impossible to ignore."
-  },
-  {
-    "id": 16,
-    "title": "Sapiens: A Brief History of Humankind",
-    "author": "Yuval Noah Harari",
-    "genre": "History, Anthropology, Philosophy",
-    "category": "philosophy",
-    "rating": "10/10",
-    "quote": "We study history not to predict the future, but to free ourselves of the past and imagine alternative destinies.",
-    "description": "The book that changes everything you think you know about human civilization. Harari weaves together history, biology, and philosophy to tell the story of how we went from insignificant apes to rulers of the planet. Reading this feels like seeing the human story from space—suddenly everything makes sense, and nothing looks the same."
-  },
-  {
-    "id": 17,
-    "title": "The Master Algorithm: How the Quest for the Ultimate Learning Machine Will Remake Our World",
-    "author": "Pedro Domingos",
-    "genre": "Machine Learning, Artificial Intelligence, Popular science",
-    "category": "science",
-    "rating": "9/10",
-    "quote": "Machine learning is something new under the sun: a technology that builds itself.",
-    "description": "Domingos makes the complex world of machine learning accessible without dumbing it down. This isn't just about algorithms—it's about the future of human knowledge itself. He shows you how the quest for the ultimate learning machine is reshaping everything from medicine to politics. Essential reading for understanding the AI revolution happening around us."
-  },
-  {
-    "id": 18,
-    "title": "Light in the Darkness: Black Holes, the Universe and Us",
-    "author": "Heino Falcke",
-    "genre": "Astrophysics, Non‑fiction",
-    "category": "science",
-    "rating": "9/10",
-    "quote": "We are part of the universe trying to understand itself.",
-    "description": "Written by one of the scientists who gave us the first image of a black hole, this is both a scientific memoir and a profound meditation on our place in the cosmos. Falcke weaves together cutting-edge astrophysics with philosophy and spirituality in a way that feels natural, not forced. Reading this is like getting a personal tour of the universe from someone who's dedicated their life to unveiling its secrets."
-  },
-  {
-    "id": 19,
-    "title": "The Little Book of Cosmology",
-    "author": "Lyman Page",
-    "genre": "Cosmology, Popular science",
-    "category": "science",
-    "rating": "8/10",
-    "quote": "The universe is not only stranger than we imagine, it is stranger than we can imagine.",
-    "description": "Don't let the 'little' in the title fool you—Page packs an enormous amount of cosmic insight into a compact, readable format. This is cosmology for people who want to understand the big picture without getting lost in the mathematics. Perfect for wrapping your head around dark matter, cosmic inflation, and the fundamental questions about our universe's past and future."
+    "quote": "Goals are about the results you want. Systems are about the processes that lead to those results.",
+    "description": "A practical framework for building good habits and breaking bad ones through small, incremental changes.",
+    "coverImageURL": "https://covers.openlibrary.org/b/id/12583335-L.jpg"
   }
 ]

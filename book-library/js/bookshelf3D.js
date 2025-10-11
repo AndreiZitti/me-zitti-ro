@@ -42,9 +42,6 @@ class Bookshelf3D {
     this.renderer.toneMappingExposure = 1.0;
     this.container.appendChild(this.renderer.domElement);
 
-    // No camera controls - completely static view
-    // OrbitControls disabled for static bookshelf view
-
     // Loading manager
     this.loadingManager = new THREE.LoadingManager();
     this.loadingManager.onProgress = (url, loaded, total) => {
@@ -66,12 +63,11 @@ class Bookshelf3D {
 
     // Event listeners
     window.addEventListener('resize', this.onWindowResize.bind(this));
-    window.addEventListener('scroll', this.onScroll.bind(this));
     this.renderer.domElement.addEventListener('click', this.onMouseClick.bind(this));
     this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
 
-    // Initial camera Y position
-    this.initialCameraY = this.camera.position.y;
+    // Clock for delta time
+    this.clock = new THREE.Clock();
 
     // Initialize
     this.init();
@@ -246,13 +242,13 @@ class Bookshelf3D {
       const shelfThickness = 0.45; // Same as in createShelves()
       const shelfY = -shelfIndex * shelfSpacing;
       const shelfTop = shelfY + shelfThickness / 2; // Half of shelf thickness
-      const bookY = shelfTop + dimensions.height / 2;
+      const bookY = shelfTop + dimensions.height / 2 -1;
 
       // Calculate Z position (books sitting on shelf)
       // Shelf depth is 4 units, centered at z=0
       // Books have depth of ~2.2-3.0 units, so they fit comfortably on shelf
       // Center books on the shelf at z=0
-      const bookZ = 0;
+      const bookZ = 1.5;
 
       const position = [
         xPosition + dimensions.width / 2,
@@ -291,16 +287,6 @@ class Bookshelf3D {
     this.camera.aspect = containerWidth / containerHeight;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(containerWidth, containerHeight);
-  }
-
-  onScroll() {
-    // Move camera down as user scrolls
-    const scrollPercent = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-
-    // Calculate camera Y position based on scroll
-    // Move camera down to show lower shelves
-    const maxCameraMove = 20; // Maximum distance to move camera down
-    this.camera.position.y = this.initialCameraY - (scrollPercent * maxCameraMove);
   }
 
   onMouseMove(event) {
@@ -350,12 +336,14 @@ class Bookshelf3D {
         }
         this.hoveredBook = hoveredBook;
         this.hoveredBook.animateHoverIn();
+        this.renderer.domElement.style.cursor = 'pointer';
       }
     } else {
       // No book hovered
       if (this.hoveredBook) {
         this.hoveredBook.animateHoverOut();
         this.hoveredBook = null;
+        this.renderer.domElement.style.cursor = 'default';
       }
     }
   }
@@ -398,10 +386,19 @@ class Bookshelf3D {
         console.log('Book clicked:', clickedBook.bookData.title);
         console.log('Is already selected?', this.selectedBook === clickedBook);
 
-        // If this book is already selected, toggle its open/close state
+        // If this book is already selected and pulled out
         if (this.selectedBook === clickedBook) {
-          console.log('Toggling book open for:', clickedBook.bookData.title);
-          clickedBook.toggleBookOpen();
+          // Detect if click was on left or right half of screen
+          // mouse.x ranges from -1 (left) to +1 (right)
+          const clickedRight = this.mouse.x > 0;
+
+          if (clickedRight) {
+            console.log('Right click - next page');
+            clickedBook.nextPage();
+          } else {
+            console.log('Left click - previous page');
+            clickedBook.previousPage();
+          }
         } else {
           // Otherwise, pull out the book
           console.log('Opening book (pulling out):', clickedBook.bookData.title);
@@ -421,31 +418,33 @@ class Bookshelf3D {
       this.selectedBook.animateClose();
     }
 
-    // Clear hover state
+    // Clear hover state and reset book position before opening
     if (this.hoveredBook) {
+      this.hoveredBook.animateHoverOut(); // Properly exit hover state
       this.hoveredBook = null;
     }
 
-    // Move book to center of screen, at proper viewing distance
+    // If the book being opened has hover offset, reset it first
+    if (book3D.isHovered) {
+      book3D.animateHoverOut();
+    }
+
+    // Move book to center of screen, zoomed in much closer for better viewing
     const targetPosition = new THREE.Vector3(
       0, // Center horizontally
-      2, // Center vertically at comfortable viewing height
-      6 // In front of camera at good viewing distance
+      3, // Center vertically at comfortable viewing height
+     8 // Very close to camera for detailed view (was 3, originally 6)
     );
 
-    // Rotate book to show front cover facing user with spine on left
-    // Books on shelf: spine on left (-X), front cover on right (+X)
-    // Rotate -90° around Y to turn front cover toward camera
-    // Tilt up (X rotation) about 20° to face the viewer better
-    const targetRotation = new THREE.Euler(-Math.PI / 9, -Math.PI / 2, 0); // -20° tilt up, -90° turn
+    // Rotate book to show front cover facing user
+    // On shelf: Spine faces forward (+Z)
+    // To show cover: Rotate -90° around Y (turn to show front cover)
+    const targetRotation = new THREE.Euler(-Math.PI / 9, -Math.PI / 2, 0); // -20° tilt, -90° Y turn to show cover
 
     book3D.animateOpen(targetPosition, targetRotation);
 
     // Store selected book
     this.selectedBook = book3D;
-
-    // Don't show text details - just display the book cover
-    // this.showBookDetails(book3D.bookData);
   }
 
   closeBook() {
@@ -456,38 +455,6 @@ class Bookshelf3D {
 
     // Reset hover state
     this.hoveredBook = null;
-
-    // Don't need to hide details since we don't show them
-    // this.hideBookDetails();
-  }
-
-  showBookDetails(bookData) {
-    const overlay = document.getElementById('book-details-overlay');
-    const closeBtn = document.getElementById('close-book-details');
-
-    // Populate details
-    document.getElementById('detail-title').textContent = bookData.title;
-    document.getElementById('detail-author').textContent = `By ${bookData.author}`;
-    document.getElementById('detail-genre').textContent = `Genre: ${bookData.genre}`;
-    document.getElementById('detail-rating').textContent = `Rating: ${bookData.rating}`;
-    document.getElementById('detail-quote').textContent = bookData.quote;
-    document.getElementById('detail-description').textContent = bookData.description;
-
-    // Show overlay
-    overlay.style.display = 'block';
-
-    // Add close button listener (remove old ones first)
-    const newCloseBtn = closeBtn.cloneNode(true);
-    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
-
-    newCloseBtn.addEventListener('click', () => {
-      this.closeBook();
-    });
-  }
-
-  hideBookDetails() {
-    const overlay = document.getElementById('book-details-overlay');
-    overlay.style.display = 'none';
   }
 
   // Method to update books based on filters/sorting
@@ -500,7 +467,6 @@ class Bookshelf3D {
 
     // Close any open book
     this.selectedBook = null;
-    this.hideBookDetails();
 
     // Temporarily override bookLibrary.books with filtered/sorted books
     const originalBooks = this.bookLibrary.books;
@@ -521,9 +487,11 @@ class Bookshelf3D {
   animate() {
     requestAnimationFrame(this.animate.bind(this));
 
+    const deltaTime = this.clock.getDelta();
+
     // Update all book animations
     this.books3D.forEach(book3D => {
-      book3D.update();
+      book3D.update(deltaTime);
     });
 
     // No controls to update - static camera

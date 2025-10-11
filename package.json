@@ -43,7 +43,12 @@
     "rimraf": "^5.0.5",
     "terser": "^5.26.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@gltf-transform/core": "^4.2.1",
+    "@gltf-transform/extensions": "^4.2.1",
+    "page-flip": "^2.0.7",
+    "three": "^0.180.0"
+  },
   "browserslist": [
     "> 1%",
     "last 2 versions",

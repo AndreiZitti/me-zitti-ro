@@ -1,494 +1,495 @@
-// Book3D.js - 3D Book Component
+// Book3D.js - 3D Book Component (CLEANED VERSION)
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 class Book3D {
   constructor(bookData, position, dimensions) {
     this.bookData = bookData;
     this.position = position;
     this.dimensions = dimensions || {
-      width: 0.3 + Math.random() * 0.15, // 0.3-0.45 units
-      height: 3.6 + Math.random() * 0.8,  // 3.6-4.4 units
-      depth: 2.5 + Math.random() * 1.0    // 2.5-3.5 units
+      width: 0.3 + Math.random() * 0.15,
+      height: 3.6 + Math.random() * 0.8,
+      depth: 2.5 + Math.random() * 1.0
     };
 
+    // Core properties
     this.mesh = null;
-    this.coverMesh = null; // Separate mesh for animated cover
-    this.coverPivot = null; // Pivot point for cover rotation (at spine edge)
-    this.pagesMesh = null; // Pages that show when book opens
+    this.gltfModel = null;
+    this.mixer = null;
+    this.flipAction = null;
+
+    // Position/rotation
     this.originalPosition = new THREE.Vector3(...position);
     this.originalRotation = new THREE.Euler(0, 0, 0);
-    this.hoverPosition = null; // Will be set on hover
-    this.isHovered = false;
-    this.isBookOpen = false; // Track if book content is open
+    this.targetPosition = null;
+    this.targetRotation = null;
 
-    // Don't call createMesh here - it will be called from bookshelf3D
+    // State
+    this.isAnimating = false;
+    this.isBookOpen = false;
+    this.isHovered = false;
+    this.isClosingToShelf = false; // Two-step close animation flag
+    this.hoverOffset = 0.5; // How far to pull out on hover
+
+    // Animation stages (assuming 24 fps based on 10.375s duration for 250 frames)
+    const fps = 24;
+    this.animationStages = [
+      { frame: 0, time: 0, name: 'closed' },
+      { frame: 65, time: 65 / fps, name: 'first_page' },
+      { frame: 105, time: 105 / fps, name: 'second_page' },
+      { frame: 150, time: 150 / fps, name: 'third_page' },
+      { frame: 250, time: 250 / fps, name: 'end' }
+    ];
+    this.currentStage = 0;
   }
 
   async createMesh() {
-    // Create book group to hold all parts
     this.mesh = new THREE.Group();
+    await this.loadGLBModel();
 
-    // Get color based on category
-    const color = this.getCategoryColor(this.bookData.category);
-
-    // Create pages texture (thin lines to simulate pages)
-    const pagesTexture = this.createPagesTexture();
-    const pagesTexturedMaterial = new THREE.MeshStandardMaterial({
-      map: pagesTexture,
-      roughness: 0.9,
-      metalness: 0.0
-    });
-
-    // Create the main book body (pages block)
-    await this.createPagesBlock(color, pagesTexturedMaterial);
-
-    // Create the animated cover
-    await this.createCover(color, pagesTexturedMaterial);
-
-    // Add spine text
-    this.addSpineText();
-
-    // Set position
     this.mesh.position.copy(this.originalPosition);
-
-    // Store book data reference
-    this.mesh.userData = {
-      bookData: this.bookData,
-      book3D: this
-    };
+    this.mesh.rotation.copy(this.originalRotation);
+    this.mesh.userData = { bookData: this.bookData, book3D: this };
   }
 
-  createPagesTexture() {
-    const pagesCanvas = document.createElement('canvas');
-    pagesCanvas.width = 512;
-    pagesCanvas.height = 512;
-    const ctx = pagesCanvas.getContext('2d');
+  async loadGLBModel() {
+    const loader = new GLTFLoader();
 
-    // Base paper color
-    ctx.fillStyle = '#F5F5DC';
-    ctx.fillRect(0, 0, 512, 512);
-
-    // Draw thin horizontal lines to simulate individual pages
-    ctx.strokeStyle = '#E8E8D0';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 512; i += 3) {
-      ctx.beginPath();
-      ctx.moveTo(0, i);
-      ctx.lineTo(512, i);
-      ctx.stroke();
-    }
-
-    return new THREE.CanvasTexture(pagesCanvas);
-  }
-
-  async createPagesBlock(color, pagesTexturedMaterial) {
-    // ====================================================================
-    // PAGES BLOCK - The main book body containing the pages
-    // ====================================================================
-    // Book orientation on shelf:
-    //   - LEFT (-X): SPINE (outward facing, colored, with text)
-    //   - RIGHT (+X): Right edge (colored)
-    //   - FRONT (+Z): Pages (white, visible when cover opens)
-    //   - BACK (-Z): Back cover (colored)
-    //   - TOP (+Y): Page edges (white)
-    //   - BOTTOM (-Y): Page edges (white)
-    // ====================================================================
-
-    // Pages block geometry (slightly smaller depth to account for cover)
-    const pagesGeometry = new THREE.BoxGeometry(
-      this.dimensions.width,
-      this.dimensions.height,
-      this.dimensions.depth * 0.95 // Slightly shallower for cover thickness
-    );
-
-    const spineMaterial = new THREE.MeshStandardMaterial({
-      color: color,
-      roughness: 0.7,
-      metalness: 0.1
-    });
-
-    const backCoverMaterial = new THREE.MeshStandardMaterial({
-      color: color,
-      roughness: 0.7,
-      metalness: 0.1
-    });
-
-    const rightEdgeMaterial = new THREE.MeshStandardMaterial({
-      color: color,
-      roughness: 0.7,
-      metalness: 0.1
-    });
-
-    // Materials for pages block
-    // BoxGeometry face order: right, left, top, bottom, front, back
-    const pagesMaterials = [
-      rightEdgeMaterial,                  // right (+X) - RIGHT EDGE (colored)
-      spineMaterial,                      // left (-X) - SPINE (colored, outward facing)
-      pagesTexturedMaterial.clone(),      // top (+Y) - PAGE EDGES (white)
-      pagesTexturedMaterial.clone(),      // bottom (-Y) - PAGE EDGES (white)
-      pagesTexturedMaterial.clone(),      // front (+Z) - PAGES (white, visible when cover opens)
-      backCoverMaterial                   // back (-Z) - BACK COVER (colored)
-    ];
-
-    this.pagesMesh = new THREE.Mesh(pagesGeometry, pagesMaterials);
-    this.pagesMesh.castShadow = true;
-    this.pagesMesh.receiveShadow = true;
-
-    // Position pages block slightly back to make room for cover
-    this.pagesMesh.position.z = -this.dimensions.depth * 0.025;
-
-    this.mesh.add(this.pagesMesh);
-  }
-
-  async createCover(color, pagesTexturedMaterial) {
-    // ====================================================================
-    // COVER - Thin animated front cover that rotates open
-    // ====================================================================
-    // Cover orientation on shelf:
-    //   - FRONT (+Z): Cover image/color (outward facing)
-    //   - BACK (-Z): Inner cover (white/cream, visible when opened)
-    //   - LEFT (-X): Spine edge (where cover attaches)
-    //   - All edges: Colored
-    // Rotation: Opens by rotating around X-axis (swings left)
-    // ====================================================================
-
-    // Cover is a thin box that will rotate open
-    // Cover thickness is along Z-axis (depth dimension)
-    const coverThickness = this.dimensions.depth * 0.05; // Thin cover (5% of depth)
-    const coverGeometry = new THREE.BoxGeometry(
-      this.dimensions.width,
-      this.dimensions.height,
-      coverThickness
-    );
-
-    // Try to load cover image if available
-    let frontCoverMaterial = new THREE.MeshStandardMaterial({
-      color: color,
-      roughness: 0.7,
-      metalness: 0.1
-    });
-
-    if (this.bookData.coverImageURL) {
-      try {
-        const texture = await this.loadCoverTexture(this.bookData.coverImageURL);
-        frontCoverMaterial = new THREE.MeshStandardMaterial({
-          map: texture,
-          roughness: 0.7,
-          metalness: 0.1
-        });
-      } catch (error) {
-        console.log(`Failed to load cover for ${this.bookData.title}, using color`);
-      }
-    }
-
-    const coverBackMaterial = new THREE.MeshStandardMaterial({
-      color: color,
-      roughness: 0.7,
-      metalness: 0.1
-    });
-
-    const innerCoverMaterial = new THREE.MeshStandardMaterial({
-      color: 0xF5F5DC, // White/cream for inner cover
-      roughness: 0.8,
-      metalness: 0.0
-    });
-
-    // Materials for cover
-    // Order: right, left, top, bottom, front, back
-    // Cover is on front (+Z), will rotate around left edge (-X)
-    const coverMaterials = [
-      coverBackMaterial.clone(),     // right edge
-      coverBackMaterial.clone(),     // left edge (spine side)
-      coverBackMaterial.clone(),     // top edge
-      coverBackMaterial.clone(),     // bottom edge
-      frontCoverMaterial,            // front (+Z) - cover image facing forward
-      innerCoverMaterial             // back (-Z) - inner cover (white/cream)
-    ];
-
-    this.coverMesh = new THREE.Mesh(coverGeometry, coverMaterials);
-    this.coverMesh.castShadow = true;
-    this.coverMesh.receiveShadow = true;
-
-    // Create first page (attached to cover, rotates with it)
-    const firstPageThickness = coverThickness * 0.3; // Thinner than cover
-    const firstPageGeometry = new THREE.BoxGeometry(
-      this.dimensions.width,
-      this.dimensions.height,
-      firstPageThickness
-    );
-
-    // First page materials - white/cream on both sides
-    const firstPageMaterial = new THREE.MeshStandardMaterial({
-      color: 0xF5F5DC,
-      roughness: 0.9,
-      metalness: 0.0
-    });
-
-    const firstPageMaterials = [
-      firstPageMaterial.clone(),  // right edge
-      firstPageMaterial.clone(),  // left edge
-      firstPageMaterial.clone(),  // top edge
-      firstPageMaterial.clone(),  // bottom edge
-      firstPageMaterial.clone(),  // front (white page)
-      firstPageMaterial.clone()   // back (white page)
-    ];
-
-    this.firstPageMesh = new THREE.Mesh(firstPageGeometry, firstPageMaterials);
-    this.firstPageMesh.castShadow = true;
-    this.firstPageMesh.receiveShadow = true;
-
-    // Create a pivot group for the cover + first page to rotate together
-    this.coverPivot = new THREE.Group();
-
-    // Position pivot at the LEFT EDGE of where the cover will be
-    // This is the spine side (-X) at the front (+Z)
-    this.coverPivot.position.set(
-      -this.dimensions.width / 2,  // Left edge (spine)
-      0,                            // Center Y
-      (this.dimensions.depth - coverThickness) / 2  // Front Z position
-    );
-
-    // Position cover relative to pivot
-    // Cover's left edge should be at pivot point (x=0 in pivot space)
-    // So cover center is at +width/2
-    this.coverMesh.position.set(
-      this.dimensions.width / 2,  // Offset right from pivot
-      0,                           // Center Y
-      0                            // Same Z as pivot
-    );
-
-    // Position first page just behind the cover (more negative Z in pivot space)
-    this.firstPageMesh.position.set(
-      this.dimensions.width / 2,   // Same X as cover
-      0,                            // Center Y
-      -(coverThickness / 2 + firstPageThickness / 2 + 0.01)  // Behind cover
-    );
-
-    // Add both cover and first page to pivot, then pivot to book
-    this.coverPivot.add(this.coverMesh);
-    this.coverPivot.add(this.firstPageMesh);
-    this.mesh.add(this.coverPivot);
-
-    console.log('Cover pivot created at:', this.coverPivot.position);
-    console.log('Cover mesh offset:', this.coverMesh.position);
-  }
-
-  addSpineText() {
-    // Create canvas for text
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-
-    // Set canvas size (higher for better quality)
-    canvas.width = 512;
-    canvas.height = 2048;
-
-    // Fill background (transparent)
-    context.fillStyle = 'rgba(0, 0, 0, 0)';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Set text style
-    context.fillStyle = 'white';
-    context.font = 'bold 60px Arial';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-
-    // Save context state
-    context.save();
-
-    // Translate to center of canvas
-    context.translate(canvas.width / 2, canvas.height / 2);
-
-    // Rotate text 90 degrees (so it reads top to bottom)
-    context.rotate(Math.PI / 2);
-
-    // Draw title
-    const title = this.bookData.title.length > 30
-      ? this.bookData.title.substring(0, 27) + '...'
-      : this.bookData.title;
-
-    context.fillText(title, 0, -100);
-
-    // Draw author (smaller)
-    context.font = 'italic 40px Arial';
-    context.fillText(this.bookData.author, 0, 100);
-
-    // Restore context
-    context.restore();
-
-    // Create texture from canvas
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.needsUpdate = true;
-
-    // Create material with texture
-    const textMaterial = new THREE.MeshBasicMaterial({
-      map: texture,
-      transparent: true
-    });
-
-    // Create plane for text (positioned on the spine - left side of book)
-    const textGeometry = new THREE.PlaneGeometry(
-      this.dimensions.depth * 0.95,
-      this.dimensions.height * 0.95
-    );
-
-    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-
-    // Position on the left side (spine)
-    textMesh.position.x = -this.dimensions.width / 2 + 0.01; // Slightly offset from surface
-    textMesh.rotation.y = -Math.PI / 2; // Face outward
-
-    this.mesh.add(textMesh);
-  }
-
-  loadCoverTexture(url) {
     return new Promise((resolve, reject) => {
-      const textureLoader = new THREE.TextureLoader();
-      textureLoader.load(
-        url,
-        (texture) => {
-          resolve(texture);
-        },
-        undefined,
-        (error) => {
-          reject(error);
+      loader.load('assets/Cover Opening Final CLEAN25.glb', (gltf) => {
+        this.gltfModel = gltf.scene;
+
+        // Scale to match book dimensions
+        const scale = this.dimensions.height / 4;
+        this.gltfModel.scale.set(scale, scale, scale);
+
+        // Set orientation for shelf based on GLB analysis:
+        // GLB structure: Cube (spine parent) with rotation [0, 0, 0.707, 0.707] = 90° Z
+        // Goal: Spine faces forward (+Z) on bookshelf
+        //
+        // Testing showed: previous rotation showed page opening side forward
+        // Need to rotate 180° more to show spine side
+        this.gltfModel.rotation.order = 'YXZ';
+
+        // Rotate to show spine forward (not page opening)
+        this.gltfModel.rotation.x = Math.PI / 2;   // Stand upright
+        this.gltfModel.rotation.y = Math.PI / 2;   // Rotate spine to face +Z (was -PI/2, now +PI/2)
+        this.gltfModel.rotation.z = 0;
+
+        // Adjust position to center on shelf
+        this.gltfModel.position.x = 0;
+        this.gltfModel.position.y = 0;
+        this.gltfModel.position.z = 0;
+
+        // Color materials and hide pages
+        let totalPages = 0;
+        let totalCovers = 0;
+
+        // First, log the hierarchy
+        console.log('\n🔍 FULL GLB HIERARCHY:');
+        this.gltfModel.traverse((child) => {
+          if (child.isMesh) {
+            const parent = child.parent ? child.parent.name : 'root';
+            console.log(`  Mesh: "${child.name}" (parent: "${parent}", vertices: ${child.geometry?.attributes.position.count})`);
+          }
+        });
+
+        this.gltfModel.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            const name = child.name;
+
+            // Cube = Spine (parent), Cube.001 = Front Cover, Cube.002 = Back Cover
+            if (name === 'Cube.001' || name === 'Cube.003') {
+              // Spine - GREEN
+              child.material = new THREE.MeshStandardMaterial({
+                color: 0x00ff00, roughness: 0.7, metalness: 0.1
+              });
+              console.log(`  ✓ Applied GREEN to SPINE: ${name}`);
+              totalCovers++;
+            } else if (name === 'Cube.002') {
+              // Front Cover - RED
+              child.material = new THREE.MeshStandardMaterial({
+                color: 0xff0000, roughness: 0.7, metalness: 0.1
+              });
+              console.log(`  ✓ Applied RED to FRONT COVER: ${name}`);
+              totalCovers++;
+            } else if (name === 'Cube.004') {
+              // Back Cover - BLACK
+              child.material = new THREE.MeshStandardMaterial({
+                color: 0x000000, roughness: 0.7, metalness: 0.1
+              });
+              console.log(`  ✓ Applied BLACK to BACK COVER: ${name}`);
+              totalCovers++;
+            } else if (name.startsWith('Plane')) {
+              // Pages - keep visible (they fill the book on shelf)
+              child.visible = true;
+              child.material = new THREE.MeshStandardMaterial({
+                color: 0xF5F5DC, roughness: 0.9, metalness: 0.0
+              });
+              totalPages++;
+            } else {
+              // Unknown mesh
+              console.log(`  ⚠️ Unknown mesh: "${child.name}"`);
+            }
+          }
+        });
+
+        console.log(`📚 GLB Model loaded: ${totalCovers} covers, ${totalPages} pages`);
+
+        // Setup animation - DON'T clamp when finished
+        if (gltf.animations && gltf.animations.length > 0) {
+          console.log('Found animations in GLB:', gltf.animations.length);
+          console.log('Animation 0 name:', gltf.animations[0].name);
+          console.log('Animation 0 duration:', gltf.animations[0].duration);
+          console.log('Animation 0 tracks:', gltf.animations[0].tracks.length);
+
+          // Log what objects are being animated
+          console.log('\n🎬 DETAILED ANIMATION ANALYSIS:');
+          console.log(`Total animations: ${gltf.animations.length}`);
+
+          // Show first 10 animation names
+          console.log('\nFirst 10 animations:');
+          gltf.animations.slice(0, 10).forEach((anim, i) => {
+            console.log(`  Animation ${i}: "${anim.name}" (${anim.tracks.length} tracks, ${anim.duration.toFixed(2)}s)`);
+            // Show what properties each track animates
+            anim.tracks.forEach((track, t) => {
+              const parts = track.name.split('.');
+              console.log(`    Track ${t}: ${parts[1]} (${track.times.length} keyframes)`);
+            });
+          });
+
+          console.log(`\nAnimation 0 tracks:`);
+          gltf.animations[0].tracks.forEach((track, i) => {
+            console.log(`  Track ${i}: ${track.name}`);
+          });
+
+          // Now check what objects actually exist in the model
+          console.log('\n🔍 OBJECTS IN GLB MODEL:');
+          const objectNames = new Set();
+          const meshNames = [];
+          const emptyNames = [];
+
+          gltf.scene.traverse((child) => {
+            if (child.name) {
+              objectNames.add(child.name);
+              if (child.isMesh) {
+                meshNames.push(child.name);
+              }
+              if (child.type === 'Object3D' && !child.isMesh) {
+                emptyNames.push(child.name);
+              }
+            }
+          });
+
+          console.log(`  Total named objects: ${objectNames.size}`);
+          console.log(`  Total MESH objects: ${meshNames.length}`);
+          console.log(`  Total EMPTY objects: ${emptyNames.length}`);
+          console.log(`  First 20 MESH names:`, meshNames.slice(0, 20));
+          const planeMeshes = meshNames.filter(n => n.toLowerCase().includes('plane'));
+          console.log(`  Searching for 'Plane' meshes (${planeMeshes.length}):`, planeMeshes);
+          console.log(`  Searching for 'Papers' or 'Practice':`, Array.from(objectNames).filter(n => n.toLowerCase().includes('paper') || n.toLowerCase().includes('practice')));
+
+          // Check for missing page numbers
+          console.log(`  Page range: ${planeMeshes[0]} to ${planeMeshes[planeMeshes.length-1]}`);
+
+          // Check if animation track names match any objects
+          console.log('\n🎯 TRACK TARGET MATCHING:');
+          gltf.animations[0].tracks.forEach((track, i) => {
+            const parts = track.name.split('.');
+            const objectName = parts[0];
+            const found = objectNames.has(objectName);
+            console.log(`  Track ${i} targets "${objectName}": ${found ? '✓ FOUND' : '❌ NOT FOUND'}`);
+          });
+          console.log('🎬 END ANIMATION ANALYSIS\n');
+
+          this.mixer = new THREE.AnimationMixer(this.gltfModel);
+
+          // Play ALL animations together (Spine + all Empties)
+          this.allActions = [];
+          gltf.animations.forEach((clip, i) => {
+            const action = this.mixer.clipAction(clip);
+            action.setLoop(THREE.LoopOnce, 1);
+            action.clampWhenFinished = false;
+            action.paused = true;
+            action.time = 0;
+            this.allActions.push(action);
+
+            if (i < 5) {
+              console.log(`  Created action ${i}: ${clip.name}`);
+            }
+          });
+
+          // Use the Spine action as the main control
+          this.flipAction = this.allActions[0];
+
+          console.log(`✓ Animation setup complete: ${this.allActions.length} actions created for ${this.bookData.title}`);
+        } else {
+          console.warn('⚠️ No animations found in GLB for:', this.bookData.title);
         }
-      );
+
+        this.mesh.add(this.gltfModel);
+        resolve();
+      }, undefined, reject);
     });
   }
 
-  getCategoryColor(category) {
-    const categoryColors = {
-      'ai': 0x4a90e2,        // Blue
-      'self-help': 0xf39c12, // Orange
-      'business': 0x27ae60,  // Green
-      'science': 0x9b59b6,   // Purple
-      'horror': 0xe74c3c,    // Red
-      'dystopian': 0x34495e, // Dark gray
-    };
+  nextPage() {
+    console.log('📖 nextPage() called');
+    console.log('  - flipAction exists?', !!this.flipAction);
+    console.log('  - currentStage:', this.currentStage);
+    console.log('  - max stages:', this.animationStages.length - 1);
 
-    return categoryColors[category] || 0x95a5a6; // Default gray
-  }
-
-  // Hover animation - tilt book out slightly
-  animateHoverIn() {
-    this.isHovered = true;
-
-    // Calculate hover position - pull book forward (positive Z) slightly
-    this.hoverPosition = this.originalPosition.clone();
-    this.hoverPosition.z += 0.8; // Pull out 0.8 units forward
-
-    this.targetPosition = this.hoverPosition.clone();
-    this.targetRotation = this.originalRotation.clone();
-    this.isAnimating = true;
-  }
-
-  animateHoverOut() {
-    this.isHovered = false;
-
-    // Return to original position
-    this.targetPosition = this.originalPosition.clone();
-    this.targetRotation = this.originalRotation.clone();
-    this.isAnimating = true;
-  }
-
-  // Book opening animation - cover rotates to the left
-  toggleBookOpen() {
-    console.log('toggleBookOpen called, current state:', this.isBookOpen);
-    console.log('coverPivot exists:', !!this.coverPivot);
-
-    this.isBookOpen = !this.isBookOpen;
-
-    if (this.isBookOpen) {
-      this.openBookCover();
-    } else {
-      this.closeBookCover();
-    }
-  }
-
-  openBookCover() {
-    console.log('openBookCover called, coverPivot:', this.coverPivot);
-    if (!this.coverPivot) {
-      console.error('No coverPivot found!');
+    if (!this.flipAction) {
+      console.error('❌ No flipAction available!');
       return;
     }
 
+    if (this.currentStage >= this.animationStages.length - 1) {
+      console.log('❌ Already at last stage');
+      return;
+    }
+
+    // First time opening - show pages (don't rotate GLB - it breaks animation!)
+    if (this.currentStage === 0) {
+      console.log('📖 First page - showing pages');
+      console.log('GLB rotation:', this.gltfModel.rotation.x, this.gltfModel.rotation.y, this.gltfModel.rotation.z);
+      console.log('Parent rotation:', this.mesh.rotation.x, this.mesh.rotation.y, this.mesh.rotation.z);
+
+      // DON'T rotate the GLB - the animation is already in the correct coordinate space
+      // Changing rotation breaks the animation orientation
+
+      let pageCount = 0;
+      this.gltfModel.traverse((child) => {
+        if (child.isMesh && child.name.toLowerCase().includes('plane')) {
+          child.visible = true;
+
+          // DON'T modify rotation - the animation needs the original rotation!
+          // The 90° rotation is intentional for the animation to work correctly
+
+          pageCount++;
+
+          // Log detailed info for first few pages
+          if (pageCount <= 3) {
+            console.log(`  Page ${pageCount} (${child.name}):`);
+            console.log(`    - Position:`, child.position);
+            console.log(`    - Rotation FIXED:`, child.rotation);
+            console.log(`    - Scale:`, child.scale);
+            console.log(`    - Visible:`, child.visible);
+            console.log(`    - Material:`, child.material);
+            console.log(`    - Geometry vertices:`, child.geometry.attributes.position.count);
+          }
+        }
+      });
+      console.log(`✅ Total pages made visible: ${pageCount}`);
+
+      // Store reference to first page to monitor during animation
+      // Pages are numbered backwards: 103 is first, 073 is last
+      this.gltfModel.traverse((child) => {
+        if (child.isMesh && child.name === 'Plane103') {
+          this._debugPage = child;
+          console.log('📍 Tracking Plane103 (FIRST page) for animation debugging');
+        }
+      });
+    }
+
+    this.currentStage++;
+    const targetStage = this.animationStages[this.currentStage];
+
+    console.log(`✓ Next page: stage ${this.currentStage}, target time ${targetStage.time.toFixed(2)}s`);
+
+    // Play ALL actions together (spine + all empty controllers)
+    if (this.allActions) {
+      console.log(`▶️ Playing ${this.allActions.length} animations simultaneously`);
+      this.allActions.forEach(action => {
+        action.paused = false;
+        action.timeScale = 1;
+        action.play();
+      });
+    } else {
+      // Fallback to single action
+      this.flipAction.paused = false;
+      this.flipAction.timeScale = 1;
+      this.flipAction.play();
+    }
+
+    this.animationTargetTime = targetStage.time;
+    this.isAnimatingForward = true;
     this.isBookOpen = true;
-    // Cover pivot rotates around Y-axis (vertical axis)
-    // When book is facing user, this swings the cover to the left
-    // Rotate -160 degrees to open
-    this.coverTargetRotation = -Math.PI * 0.89; // -160 degrees
-    console.log('Cover target rotation set to:', this.coverTargetRotation);
   }
 
-  closeBookCover() {
-    if (!this.coverPivot) return;
+  previousPage() {
+    if (!this.flipAction || this.currentStage <= 0) {
+      return;
+    }
 
-    this.isBookOpen = false;
-    // Return cover to closed position
-    this.coverTargetRotation = 0;
-    console.log('Closing book cover');
+    this.currentStage--;
+    const targetStage = this.animationStages[this.currentStage];
+
+    console.log(`Previous page: stage ${this.currentStage}, target time ${targetStage.time.toFixed(2)}s`);
+
+    this.flipAction.paused = false;
+    this.flipAction.timeScale = -1;
+    this.flipAction.play();
+    this.animationTargetTime = targetStage.time;
+    this.isAnimatingBackward = true;
+
+    if (this.currentStage === 0) {
+      this.isBookOpen = false;
+    }
   }
 
-  // Animation methods - smooth transitions
-  animateOpen(targetPosition, targetRotation, duration = 500) {
+  animateOpen(targetPosition, targetRotation) {
+    // Clear hover state before opening
     this.isHovered = false;
+    this.hoverTargetZ = undefined;
 
-    // Set target properties for smooth animation in render loop
     this.targetPosition = targetPosition.clone();
     this.targetRotation = targetRotation.clone();
     this.isAnimating = true;
   }
 
-  animateClose(duration = 500) {
-    // Set target to original position for smooth animation
+  animateClose() {
+    // Reset animation and hide pages
+    if (this.currentStage > 0) {
+      this.currentStage = 0;
+      if (this.flipAction) {
+        this.flipAction.time = 0;
+        this.flipAction.paused = true;
+      }
+      if (this.allActions) {
+        this.allActions.forEach(action => {
+          action.time = 0;
+          action.paused = true;
+        });
+      }
+      // Note: Pages stay visible on shelf to fill the book
+      // The animation reset to time=0 will put them back in closed position
+    }
+    this.isBookOpen = false;
+
+    // First rotate to spine-forward (closed orientation) before returning to shelf
+    // Current position: book is at center, showing cover (rotation Y = -90°)
+    // Target: rotate to spine forward (rotation Y = 0°) while staying at center
+    const currentPosition = this.mesh.position.clone();
+    const closedRotation = new THREE.Euler(0, 0, 0); // Spine forward orientation
+
+    this.targetPosition = currentPosition; // Stay at current position
+    this.targetRotation = closedRotation;
+    this.isAnimating = true;
+    this.isClosingToShelf = true; // Flag to trigger second animation step
+  }
+
+  returnToShelf() {
     this.targetPosition = this.originalPosition.clone();
     this.targetRotation = this.originalRotation.clone();
     this.isAnimating = true;
-    this.isHovered = false;
-
-    // Close the book cover when returning to shelf
-    this.closeBookCover();
   }
 
-  // Update method to be called each frame (from render loop)
-  update() {
-    // Animate book position and rotation
-    if (this.isAnimating) {
-      if (this.targetPosition && this.targetRotation) {
-        // Lerp (linear interpolation) for smooth movement
-        // Slower animation for more graceful movement
-        const lerpFactor = this.isHovered ? 0.08 : 0.05;
+  // Hover methods - pull book out slightly
+  animateHoverIn() {
+    if (this.isBookOpen) return; // Don't hover if book is open
+    this.isHovered = true;
+    this.hoverTargetZ = this.originalPosition.z + this.hoverOffset;
+  }
 
-        this.mesh.position.lerp(this.targetPosition, lerpFactor);
-        this.mesh.rotation.x += (this.targetRotation.x - this.mesh.rotation.x) * lerpFactor;
-        this.mesh.rotation.y += (this.targetRotation.y - this.mesh.rotation.y) * lerpFactor;
-        this.mesh.rotation.z += (this.targetRotation.z - this.mesh.rotation.z) * lerpFactor;
+  animateHoverOut() {
+    this.isHovered = false;
+    this.hoverTargetZ = this.originalPosition.z;
+  }
 
-        // Check if we're close enough to target (stop animating)
-        const positionDistance = this.mesh.position.distanceTo(this.targetPosition);
-        if (positionDistance < 0.01) {
-          this.mesh.position.copy(this.targetPosition);
-          this.mesh.rotation.copy(this.targetRotation);
-          this.isAnimating = false;
+  update(deltaTime) {
+    // Animate book position/rotation (opening/closing)
+    if (this.isAnimating && this.targetPosition && this.targetRotation) {
+      const lerpFactor = 0.05;
+      this.mesh.position.lerp(this.targetPosition, lerpFactor);
+      this.mesh.rotation.x += (this.targetRotation.x - this.mesh.rotation.x) * lerpFactor;
+      this.mesh.rotation.y += (this.targetRotation.y - this.mesh.rotation.y) * lerpFactor;
+      this.mesh.rotation.z += (this.targetRotation.z - this.mesh.rotation.z) * lerpFactor;
+
+      const positionClose = this.mesh.position.distanceTo(this.targetPosition) < 0.01;
+      const rotationClose = Math.abs(this.mesh.rotation.y - this.targetRotation.y) < 0.01;
+
+      if (positionClose && rotationClose) {
+        this.mesh.position.copy(this.targetPosition);
+        this.mesh.rotation.copy(this.targetRotation);
+        this.isAnimating = false;
+
+        // If this was step 1 of closing (rotate to spine-forward), now do step 2 (return to shelf)
+        if (this.isClosingToShelf) {
+          this.isClosingToShelf = false;
+          this.returnToShelf(); // Now animate back to shelf
         }
       }
     }
 
-    // Animate cover opening/closing
-    if (this.coverPivot && this.coverTargetRotation !== undefined) {
-      const coverLerpFactor = 0.08;
-      const currentRotation = this.coverPivot.rotation.y;
-      const diff = this.coverTargetRotation - currentRotation;
+    // Animate hover effect (pull out on Z axis)
+    if (!this.isAnimating && this.hoverTargetZ !== undefined) {
+      const lerpFactor = 0.15; // Faster for hover
+      const currentZ = this.mesh.position.z;
+      const newZ = currentZ + (this.hoverTargetZ - currentZ) * lerpFactor;
 
-      if (Math.abs(diff) > 0.01) {
-        this.coverPivot.rotation.y += diff * coverLerpFactor;
-        // Log occasionally to avoid spam
-        if (Math.random() < 0.05) {
-          console.log('Animating cover - current:', currentRotation.toFixed(3), 'target:', this.coverTargetRotation.toFixed(3), 'diff:', diff.toFixed(3));
+      // Only update Z, keep X and Y at original position
+      this.mesh.position.z = newZ;
+
+      // Stop animating when close enough
+      if (Math.abs(newZ - this.hoverTargetZ) < 0.001) {
+        this.mesh.position.z = this.hoverTargetZ;
+      }
+    }
+
+    // Update animation mixer
+    if (this.mixer && deltaTime && this.flipAction) {
+      this.mixer.update(deltaTime);
+
+      // Log animation state occasionally for debugging
+      if (this.isAnimatingForward || this.isAnimatingBackward) {
+        if (!this._lastLogTime || Date.now() - this._lastLogTime > 500) {
+          console.log(`⏩ Animation: ${this.flipAction.time.toFixed(2)}s / ${this.flipAction.getClip().duration.toFixed(2)}s (target: ${this.animationTargetTime.toFixed(2)}s, deltaTime: ${(deltaTime * 1000).toFixed(1)}ms, paused: ${this.flipAction.paused})`);
+
+          // Check if the page is actually moving
+          if (this._debugPage) {
+            console.log(`   📄 Plane103 (first page) position: (${this._debugPage.position.x.toFixed(3)}, ${this._debugPage.position.y.toFixed(3)}, ${this._debugPage.position.z.toFixed(3)})`);
+            console.log(`   📄 Plane103 (first page) rotation: (${this._debugPage.rotation.x.toFixed(2)}, ${this._debugPage.rotation.y.toFixed(2)}, ${this._debugPage.rotation.z.toFixed(2)})`);
+          }
+
+          this._lastLogTime = Date.now();
         }
-      } else {
-        this.coverPivot.rotation.y = this.coverTargetRotation;
-        console.log('Cover animation complete at:', this.coverTargetRotation);
+      }
+
+      // Check if reached target time (forward)
+      if (this.isAnimatingForward && this.flipAction.time >= this.animationTargetTime) {
+        // Pause all actions at target time
+        if (this.allActions) {
+          this.allActions.forEach(action => {
+            action.time = this.animationTargetTime;
+            action.paused = true;
+          });
+        } else {
+          this.flipAction.time = this.animationTargetTime;
+          this.flipAction.paused = true;
+        }
+        this.isAnimatingForward = false;
+        console.log(`✓ Paused all ${this.allActions?.length || 1} animations at stage ${this.currentStage}, time ${this.flipAction.time.toFixed(2)}s`);
+      }
+
+      // Check if reached target time (backward)
+      if (this.isAnimatingBackward && this.flipAction.time <= this.animationTargetTime) {
+        this.flipAction.time = this.animationTargetTime;
+        this.flipAction.paused = true;
+        this.flipAction.timeScale = 1;
+        this.isAnimatingBackward = false;
+        console.log(`✓ Paused at stage ${this.currentStage}, time ${this.flipAction.time.toFixed(2)}s`);
+
+        // Hide pages if back to closed
+        if (this.currentStage === 0 && this.gltfModel) {
+          this.gltfModel.traverse((child) => {
+            if (child.isMesh && child.name.toLowerCase().includes('plane')) {
+              child.visible = false;
+            }
+          });
+        }
       }
     }
   }

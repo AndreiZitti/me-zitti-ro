@@ -1,5 +1,151 @@
 /* Personal Book Library - Three.js 3D Showcase Styles */
 
+/* Page Flip Overlay */
+#page-flip-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-flip-container {
+  position: relative;
+  width: 80vw;
+  height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#page-flip-book {
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* StPageFlip creates a canvas - make sure it's visible */
+#page-flip-book canvas {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.page-flip-container .close-btn {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: white;
+  border: none;
+  font-size: 30px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+/* Page styles for StPageFlip */
+.page {
+  background: white;
+  color: #000;
+  border: 1px solid #ccc;
+}
+
+.page-content {
+  width: 100%;
+  height: 100%;
+  padding: 40px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-cover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.page-cover-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.page-cover-content h1 {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.page-cover-content h2 {
+  font-size: 24px;
+  font-style: italic;
+}
+
+.page-cover-content .genre-tag {
+  margin-top: 20px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.page-back-cover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.page-back-cover .quote {
+  font-size: 20px;
+  font-style: italic;
+  margin-bottom: 30px;
+  line-height: 1.8;
+}
+
+.page-back-cover .rating {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.page-header {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.page-text {
+  flex: 1;
+}
+
+.page-text h3 {
+  margin-top: 0;
+}
+
+.page-text p {
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.page-footer {
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+}
+
 /* Reset body and html for scrollable fullscreen */
 html, body {
   margin: 0;
@@ -15,6 +161,7 @@ html, body {
   height: 300vh; /* 3x viewport height to allow scrolling through shelves */
   width: 1px;
   pointer-events: none;
+  opacity: 0;
 }
 
 /* Fullscreen Three.js Canvas Container */

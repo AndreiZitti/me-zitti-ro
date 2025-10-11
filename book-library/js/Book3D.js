@@ -36,8 +36,9 @@ class Book3D {
     this.animationStages = [
       { frame: 0, time: 0, name: 'closed' },
       { frame: 65, time: 65 / fps, name: 'first_page' },
-      { frame: 105, time: 105 / fps, name: 'second_page' },
-      { frame: 150, time: 150 / fps, name: 'third_page' },
+      { frame: 91, time: 91 / fps, name: 'second_page' },
+      { frame: 124, time: 124 / fps, name: 'third_page' },
+      { frame: 160, time: 160 / fps, name: 'fourth_page' },
       { frame: 250, time: 250 / fps, name: 'end' }
     ];
     this.currentStage = 0;

@@ -482,14 +482,8 @@ class Book3D {
         this.isAnimatingBackward = false;
         console.log(`✓ Paused at stage ${this.currentStage}, time ${this.flipAction.time.toFixed(2)}s`);
 
-        // Hide pages if back to closed
-        if (this.currentStage === 0 && this.gltfModel) {
-          this.gltfModel.traverse((child) => {
-            if (child.isMesh && child.name.toLowerCase().includes('plane')) {
-              child.visible = false;
-            }
-          });
-        }
+        // Pages stay visible even at stage 0 (they're in closed position at time=0)
+        // This makes the book look filled on the shelf
       }
     }
   }

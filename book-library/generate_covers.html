@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Book Covers</title>
+</head>
+<body>
+    <h1>Universe in a Nutshell - Spine and Back Cover Generator</h1>
+    <p>Right-click each canvas and save as image to the UniverseInANutshell folder</p>
+
+    <h2>Spine (200x800)</h2>
+    <canvas id="spine" width="200" height="800"></canvas>
+
+    <h2>Back Cover (600x800)</h2>
+    <canvas id="backCover" width="600" height="800"></canvas>
+
+    <script>
+        // Color: #1b161c
+        const color = '#1b161c';
+
+        // Draw spine
+        const spineCanvas = document.getElementById('spine');
+        const spineCtx = spineCanvas.getContext('2d');
+        spineCtx.fillStyle = color;
+        spineCtx.fillRect(0, 0, 200, 800);
+
+        // Draw back cover
+        const backCanvas = document.getElementById('backCover');
+        const backCtx = backCanvas.getContext('2d');
+        backCtx.fillStyle = color;
+        backCtx.fillRect(0, 0, 600, 800);
+
+        // Auto-download function
+        function downloadCanvas(canvas, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        // Add download buttons
+        const downloadBtn1 = document.createElement('button');
+        downloadBtn1.textContent = 'Download Spine';
+        downloadBtn1.onclick = () => downloadCanvas(spineCanvas, 'Spine.png');
+
+        const downloadBtn2 = document.createElement('button');
+        downloadBtn2.textContent = 'Download Back Cover';
+        downloadBtn2.onclick = () => downloadCanvas(backCanvas, 'BackCover.png');
+
+        document.body.appendChild(document.createElement('br'));
+        document.body.appendChild(downloadBtn1);
+        document.body.appendChild(document.createElement('br'));
+        document.body.appendChild(document.createElement('br'));
+        document.body.appendChild(downloadBtn2);
+    </script>
+</body>
+</html>

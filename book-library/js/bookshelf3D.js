@@ -29,7 +29,7 @@ class Bookshelf3D {
       0.1,
       1000
     );
-    this.camera.position.set(0, 5, 14); // Better angle to see books on shelf
+    this.camera.position.set(0, 5, 8); // Much closer to books (was 14, now 8)
     this.camera.lookAt(0, 0, 0);
 
     // Renderer setup
@@ -204,7 +204,7 @@ class Bookshelf3D {
     const booksPerShelf = this.bookLibrary.booksPerShelf;
     const shelfSpacing = 4.5;
     const shelfWidth = 7; // Usable width for books (reduced to match shorter shelf)
-    const bookSpacing = 0.12; // Gap between books
+    const bookSpacing = 0.04; // Minimal gap between books - nearly touching like real shelf
 
     let currentShelf = 0;
     let xPosition = -shelfWidth / 2; // Start from left edge
@@ -229,7 +229,7 @@ class Bookshelf3D {
       };
 
       const dimensions = {
-        width: (0.18 + seededRandom(seed) * 0.12) * 2,  // 0.36 - 0.60 (spine width)
+        width: 0.25 + seededRandom(seed) * 0.10,        // 0.25 - 0.35 (spine width - tighter range)
         height: 3.5 + seededRandom(seed + 100) * 1.0,   // 3.5 - 4.5 (book height)
         depth: 2.2 + seededRandom(seed + 200) * 0.8     // 2.2 - 3.0 (page width/book depth)
       };
@@ -262,22 +262,61 @@ class Bookshelf3D {
       // Store reference
       this.books3D.push(book3D);
 
-      // Wait for mesh creation (async)
-      book3D.createMesh().then(() => {
-        // Add to scene after creation
-        if (book3D.mesh) {
-          this.scene.add(book3D.mesh);
-          console.log(`Book added: ${bookData.title}`);
-        }
-      }).catch(error => {
-        console.error(`Error creating book ${bookData.title}:`, error);
-      });
+      // Progressive loading: Add delay based on index (150ms per book)
+      // Books appear from left to right
+      const loadDelay = index * 150;
+
+      setTimeout(() => {
+        book3D.createMesh().then(() => {
+          // Add to scene after creation
+          if (book3D.mesh) {
+            // Start with opacity 0 for fade-in effect
+            book3D.mesh.traverse((child) => {
+              if (child.isMesh && child.material) {
+                child.material.transparent = true;
+                child.material.opacity = 0;
+              }
+            });
+
+            this.scene.add(book3D.mesh);
+
+            // Fade in animation
+            const fadeInDuration = 1500; // 1.5 seconds fade in (slower)
+            const fadeStartTime = Date.now();
+
+            const fadeIn = () => {
+              const elapsed = Date.now() - fadeStartTime;
+              const progress = Math.min(elapsed / fadeInDuration, 1);
+
+              book3D.mesh.traverse((child) => {
+                if (child.isMesh && child.material) {
+                  child.material.opacity = progress;
+                }
+              });
+
+              if (progress < 1) {
+                requestAnimationFrame(fadeIn);
+              } else {
+                // Reset transparency after fade complete
+                book3D.mesh.traverse((child) => {
+                  if (child.isMesh && child.material) {
+                    child.material.transparent = false;
+                    child.material.opacity = 1;
+                  }
+                });
+              }
+            };
+
+            fadeIn();
+          }
+        }).catch(error => {
+          // Silently handle error or use a fallback
+        });
+      }, loadDelay);
 
       // Move x position for next book
       xPosition += dimensions.width + bookSpacing;
     });
-
-    console.log(`Created ${this.books3D.length} books on ${currentShelf + 1} shelves`);
   }
 
   onWindowResize() {
@@ -433,13 +472,13 @@ class Bookshelf3D {
     const targetPosition = new THREE.Vector3(
       0, // Center horizontally
       3, // Center vertically at comfortable viewing height
-     8 // Very close to camera for detailed view (was 3, originally 6)
+      5 // Close to camera for detailed view (camera is at z=8, so book at z=5 is 3 units in front)
     );
 
     // Rotate book to show front cover facing user
     // On shelf: Spine faces forward (+Z)
     // To show cover: Rotate -90° around Y (turn to show front cover)
-    const targetRotation = new THREE.Euler(-Math.PI / 9, -Math.PI / 2, 0); // -20° tilt, -90° Y turn to show cover
+    const targetRotation = new THREE.Euler(-Math.PI / 6, -Math.PI / 2, 0); // -30° tilt (was -20°), -90° Y turn to show cover
 
     book3D.animateOpen(targetPosition, targetRotation);
 

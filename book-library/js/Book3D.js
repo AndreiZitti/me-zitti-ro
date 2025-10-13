@@ -44,37 +44,36 @@ class Book3D {
     this.currentStage = 0;
   }
 
-  async createMesh() {
+  async createMesh(loadTextures = false) {
     this.mesh = new THREE.Group();
-    await this.loadGLBModel();
+    this.texturesLoaded = false;
+    await this.loadGLBModel(loadTextures);
 
     this.mesh.position.copy(this.originalPosition);
     this.mesh.rotation.copy(this.originalRotation);
     this.mesh.userData = { bookData: this.bookData, book3D: this };
   }
 
-  async loadGLBModel() {
+  async loadGLBModel(loadTextures = false) {
     const loader = new GLTFLoader();
+    const textureLoader = new THREE.TextureLoader();
+    this.bookMeshes = {}; // Store references to book parts for lazy loading
 
     return new Promise((resolve, reject) => {
-      loader.load('assets/Cover Opening Final CLEAN25.glb', (gltf) => {
+      loader.load('assets/Cover Opening Final BestVersionUVMAPPINGBEST33.glb', (gltf) => {
         this.gltfModel = gltf.scene;
 
         // Scale to match book dimensions
         const scale = this.dimensions.height / 4;
         this.gltfModel.scale.set(scale, scale, scale);
 
-        // Set orientation for shelf based on GLB analysis:
-        // GLB structure: Cube (spine parent) with rotation [0, 0, 0.707, 0.707] = 90° Z
-        // Goal: Spine faces forward (+Z) on bookshelf
-        //
-        // Testing showed: previous rotation showed page opening side forward
-        // Need to rotate 180° more to show spine side
+        // Set orientation for shelf:
+        // Goal: Spine faces user (+Z), front cover to the right (+X), back cover to the left (-X)
         this.gltfModel.rotation.order = 'YXZ';
 
-        // Rotate to show spine forward (not page opening)
+        // Rotate to show spine forward
         this.gltfModel.rotation.x = Math.PI / 2;   // Stand upright
-        this.gltfModel.rotation.y = Math.PI / 2;   // Rotate spine to face +Z (was -PI/2, now +PI/2)
+        this.gltfModel.rotation.y = Math.PI / 2;   // Spine faces forward (+Z)
         this.gltfModel.rotation.z = 0;
 
         // Adjust position to center on shelf
@@ -86,49 +85,214 @@ class Book3D {
         let totalPages = 0;
         let totalCovers = 0;
 
-        // First, log the hierarchy
-        console.log('\n🔍 FULL GLB HIERARCHY:');
-        this.gltfModel.traverse((child) => {
-          if (child.isMesh) {
-            const parent = child.parent ? child.parent.name : 'root';
-            console.log(`  Mesh: "${child.name}" (parent: "${parent}", vertices: ${child.geometry?.attributes.position.count})`);
-          }
-        });
-
         this.gltfModel.traverse((child) => {
           if (child.isMesh) {
             child.castShadow = true;
             child.receiveShadow = true;
             const name = child.name;
 
-            // Cube = Spine (parent), Cube.001 = Front Cover, Cube.002 = Back Cover
-            if (name === 'Cube.001' || name === 'Cube.003') {
-              // Spine - GREEN
-              child.material = new THREE.MeshStandardMaterial({
-                color: 0x00ff00, roughness: 0.7, metalness: 0.1
-              });
-              console.log(`  ✓ Applied GREEN to SPINE: ${name}`);
+            // Based on testing: Cube = spine, Cube002 = FRONT cover (what we see when pulled out), Cube001 = BACK cover
+            if (name === 'Cube') {
+              // Spine - Apply texture (UV mapping fixed in Blender)
+              if (this.bookData.spineURL) {
+                console.log(`  📸 Loading texture for SPINE ${this.bookData.title}: ${this.bookData.spineURL}`);
+                textureLoader.load(
+                  this.bookData.spineURL,
+                  (texture) => {
+                    texture.colorSpace = THREE.SRGBColorSpace;
+                    texture.wrapS = THREE.ClampToEdgeWrapping;
+                    texture.wrapT = THREE.ClampToEdgeWrapping;
+                    child.material = new THREE.MeshStandardMaterial({
+                      map: texture,
+                      roughness: 0.8,
+                      metalness: 0.1
+                    });
+                    console.log(`  ✅ TEXTURE applied to SPINE (Cube) - using Blender UVs`);
+                  },
+                  undefined,
+                  (error) => {
+                    console.error(`  ❌ Failed to load spine texture:`, error);
+                    child.material = new THREE.MeshStandardMaterial({
+                      color: 0xe33c39, roughness: 0.8, metalness: 0.1
+                    });
+                  }
+                );
+              } else {
+                // Check for specific books that need custom colors
+                let spineColor = 0xe33c39; // Default red
+                if (this.bookData.title === "The Universe in a Nutshell") {
+                  spineColor = 0x000000; // Black for Universe in a Nutshell
+                } else if (this.bookData.title === "Brief Answers to the Big Questions") {
+                  spineColor = 0xFFFFFF; // White for Brief Answers
+                }
+
+                child.material = new THREE.MeshStandardMaterial({
+                  color: spineColor, roughness: 0.8, metalness: 0.1
+                });
+                console.log(`  ✓ Applied color #${spineColor.toString(16)} to SPINE: ${name}`);
+              }
               totalCovers++;
-            } else if (name === 'Cube.002') {
-              // Front Cover - RED
-              child.material = new THREE.MeshStandardMaterial({
-                color: 0xff0000, roughness: 0.7, metalness: 0.1
-              });
-              console.log(`  ✓ Applied RED to FRONT COVER: ${name}`);
+            } else if (name === 'Cube002') {
+              // FRONT Cover (visible when book is pulled out) - Apply texture simply
+              if (this.bookData.frontCoverURL) {
+                console.log(`  📸 Loading texture for FRONT COVER ${this.bookData.title}: ${this.bookData.frontCoverURL}`);
+                textureLoader.load(
+                  this.bookData.frontCoverURL,
+                  (texture) => {
+                    texture.colorSpace = THREE.SRGBColorSpace;
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.rotation = Math.PI; // Rotate 180 degrees
+                    texture.center.set(0.5, 0.5); // Rotate around center
+                    child.material = new THREE.MeshStandardMaterial({
+                      map: texture,
+                      roughness: 0.7,
+                      metalness: 0.1
+                    });
+                    console.log(`  ✅ TEXTURE applied to FRONT COVER (Cube002) - rotated 180°`);
+                  },
+                  undefined,
+                  (error) => {
+                    console.error(`  ❌ Failed to load front cover texture:`, error);
+                    child.material = new THREE.MeshStandardMaterial({
+                      color: 0xff0000, roughness: 0.7, metalness: 0.1
+                    });
+                  }
+                );
+              } else {
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xff0000, roughness: 0.7, metalness: 0.1
+                });
+              }
               totalCovers++;
-            } else if (name === 'Cube.004') {
-              // Back Cover - BLACK
-              child.material = new THREE.MeshStandardMaterial({
-                color: 0x000000, roughness: 0.7, metalness: 0.1
-              });
-              console.log(`  ✓ Applied BLACK to BACK COVER: ${name}`);
+            } else if (name === 'Cube001') {
+              // BACK Cover (facing shelf) - Apply texture if available
+              if (this.bookData.backCoverURL) {
+                console.log(`  📸 Loading texture for BACK COVER ${this.bookData.title}: ${this.bookData.backCoverURL}`);
+                textureLoader.load(
+                  this.bookData.backCoverURL,
+                  (texture) => {
+                    texture.colorSpace = THREE.SRGBColorSpace;
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    child.material = new THREE.MeshStandardMaterial({
+                      map: texture,
+                      roughness: 0.7,
+                      metalness: 0.1
+                    });
+                    console.log(`  ✅ TEXTURE applied to BACK COVER (Cube001)`);
+                  },
+                  undefined,
+                  (error) => {
+                    console.error(`  ❌ Failed to load back cover texture:`, error);
+                    child.material = new THREE.MeshStandardMaterial({
+                      color: 0xe33c39, roughness: 0.7, metalness: 0.1
+                    });
+                  }
+                );
+              } else {
+                // Check for specific books that need custom colors
+                let backColor = 0xe33c39; // Default red
+                if (this.bookData.title === "The Universe in a Nutshell") {
+                  backColor = 0x000000; // Black for Universe in a Nutshell
+                } else if (this.bookData.title === "Brief Answers to the Big Questions") {
+                  backColor = 0xFFFFFF; // White for Brief Answers
+                }
+
+                child.material = new THREE.MeshStandardMaterial({
+                  color: backColor,
+                  roughness: 0.7,
+                  metalness: 0.1
+                });
+                console.log(`  ✓ Applied color #${backColor.toString(16)} to BACK COVER: ${name}`);
+              }
               totalCovers++;
             } else if (name.startsWith('Plane')) {
-              // Pages - keep visible (they fill the book on shelf)
+              // Pages - add text texture with variety (title pages and content pages)
               child.visible = true;
+
+              // Determine page type based on page number
+              const pageNum = totalPages;
+              const isTitlePage = pageNum % 7 === 0; // Every 7th page is a title page
+
+              // Create a canvas to render text
+              const canvas = document.createElement('canvas');
+              canvas.width = 512;
+              canvas.height = 1024;
+              const ctx = canvas.getContext('2d');
+
+              // Background
+              ctx.fillStyle = '#F5F5DC'; // Beige page color
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+              if (isTitlePage) {
+                // Title page - centered chapter title
+                const chapterNum = Math.floor(pageNum / 7) + 1;
+
+                ctx.fillStyle = '#2c2c2c';
+                ctx.font = 'bold 48px Georgia, serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`Chapter ${chapterNum}`, canvas.width / 2, canvas.height / 2 - 40);
+
+                ctx.font = '32px Georgia, serif';
+                ctx.fillText('The Beginning', canvas.width / 2, canvas.height / 2 + 40);
+              } else {
+                // Regular page with text
+                ctx.fillStyle = '#2c2c2c';
+                ctx.font = '24px Georgia, serif';
+                ctx.textAlign = 'left';
+
+                // Lorem ipsum text
+                const loremText = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.\n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\nSed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.\n\nNemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.';
+
+                // Word wrap function
+                const wrapText = (text, x, y, maxWidth, lineHeight) => {
+                  const paragraphs = text.split('\n\n');
+                  let currentY = y;
+
+                  paragraphs.forEach(paragraph => {
+                    const words = paragraph.split(' ');
+                    let line = '';
+
+                    words.forEach((word, i) => {
+                      const testLine = line + word + ' ';
+                      const metrics = ctx.measureText(testLine);
+
+                      if (metrics.width > maxWidth && i > 0) {
+                        ctx.fillText(line, x, currentY);
+                        line = word + ' ';
+                        currentY += lineHeight;
+                      } else {
+                        line = testLine;
+                      }
+                    });
+
+                    ctx.fillText(line, x, currentY);
+                    currentY += lineHeight * 1.8;
+                  });
+                };
+
+                wrapText(loremText, 40, 50, canvas.width - 80, 32);
+
+                // Add page number at bottom
+                ctx.fillStyle = '#999';
+                ctx.font = '14px Georgia, serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${pageNum + 1}`, canvas.width / 2, canvas.height - 30);
+              }
+
+              // Create texture from canvas
+              const pageTexture = new THREE.CanvasTexture(canvas);
+              pageTexture.colorSpace = THREE.SRGBColorSpace;
+              pageTexture.flipY = false; // Don't flip - keep text right-side up
+
               child.material = new THREE.MeshStandardMaterial({
-                color: 0xF5F5DC, roughness: 0.9, metalness: 0.0
+                map: pageTexture,
+                roughness: 0.9,
+                metalness: 0.0,
+                side: THREE.DoubleSide // Render both sides
               });
+
               totalPages++;
             } else {
               // Unknown mesh
@@ -305,13 +469,13 @@ class Book3D {
       console.log(`▶️ Playing ${this.allActions.length} animations simultaneously`);
       this.allActions.forEach(action => {
         action.paused = false;
-        action.timeScale = 1;
+        action.timeScale = 1.2; // Faster page turn (was 1.0)
         action.play();
       });
     } else {
       // Fallback to single action
       this.flipAction.paused = false;
-      this.flipAction.timeScale = 1;
+      this.flipAction.timeScale = 1.2; // Faster page turn (was 1.0)
       this.flipAction.play();
     }
 
@@ -403,7 +567,8 @@ class Book3D {
   update(deltaTime) {
     // Animate book position/rotation (opening/closing)
     if (this.isAnimating && this.targetPosition && this.targetRotation) {
-      const lerpFactor = 0.05;
+      // Faster animation for picking up and putting down books
+      const lerpFactor = this.isClosingToShelf || !this.isBookOpen ? 0.12 : 0.08; // Much faster (was 0.05)
       this.mesh.position.lerp(this.targetPosition, lerpFactor);
       this.mesh.rotation.x += (this.targetRotation.x - this.mesh.rotation.x) * lerpFactor;
       this.mesh.rotation.y += (this.targetRotation.y - this.mesh.rotation.y) * lerpFactor;
@@ -427,7 +592,7 @@ class Book3D {
 
     // Animate hover effect (pull out on Z axis)
     if (!this.isAnimating && this.hoverTargetZ !== undefined) {
-      const lerpFactor = 0.15; // Faster for hover
+      const lerpFactor = 0.25; // Even faster for hover (was 0.15)
       const currentZ = this.mesh.position.z;
       const newZ = currentZ + (this.hoverTargetZ - currentZ) * lerpFactor;
 

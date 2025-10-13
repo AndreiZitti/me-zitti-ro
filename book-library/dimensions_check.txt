@@ -1,0 +1,95 @@
+=== BOOK DIMENSIONS & IMAGE REQUIREMENTS ===
+
+
+============================================================
+Front Cover (Cube.002):
+============================================================
+
+Main Face Analysis:
+  Area: 3.0213 sq units
+  Normal: <Vector (0.0000, 0.0000, -1.0000)>
+
+Physical Dimensions (Blender units):
+  Width: 2.0142
+  Height: 1.5000
+  Aspect Ratio: 1.3428 : 1
+
+📐 RECOMMENDED IMAGE DIMENSIONS:
+  3222 x 2400 pixels
+  Aspect Ratio: 1.343:1
+
+  Alternative sizes (same aspect ratio):
+    - 1611 x 1200 px
+    - 2416 x 1800 px
+    - 4833 x 3600 px
+
+✓ UV Mapping Status:
+  UV coordinates: [(0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)]
+  ✓ PERFECT! Using full UV space (0,0) to (1,1)
+
+============================================================
+Back Cover (Cube.001):
+============================================================
+
+Main Face Analysis:
+  Area: 3.0177 sq units
+  Normal: <Vector (0.0000, 0.0000, -1.0000)>
+
+Physical Dimensions (Blender units):
+  Width: 2.0118
+  Height: 1.5000
+  Aspect Ratio: 1.3412 : 1
+
+📐 RECOMMENDED IMAGE DIMENSIONS:
+  3218 x 2400 pixels
+  Aspect Ratio: 1.341:1
+
+  Alternative sizes (same aspect ratio):
+    - 1609 x 1200 px
+    - 2413 x 1800 px
+    - 4827 x 3600 px
+
+✓ UV Mapping Status:
+  UV coordinates: [(0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)]
+  ✓ PERFECT! Using full UV space (0,0) to (1,1)
+
+============================================================
+Spine (Cube):
+============================================================
+
+Main Face Analysis:
+  Area: 4.0000 sq units
+  Normal: <Vector (-1.0000, -0.0000, 0.0000)>
+
+Physical Dimensions (Blender units):
+  Width: 2.0000
+  Height: 2.0000
+  Aspect Ratio: 1.0000 : 1
+
+📐 RECOMMENDED IMAGE DIMENSIONS:
+  1600 x 1600 pixels
+  Aspect Ratio: 1.000:1
+
+  Alternative sizes (same aspect ratio):
+    - 800 x 800 px
+    - 1200 x 1200 px
+    - 2400 x 2400 px
+
+✓ UV Mapping Status:
+  UV coordinates: [(0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)]
+  ✓ PERFECT! Using full UV space (0,0) to (1,1)
+
+
+============================================================
+SUMMARY:
+============================================================
+Create your images with the dimensions above.
+If aspect ratios don't match exactly, images will stretch.
+
+💡 TIP: If you have square images (1:1 aspect), they will
+   be stretched to fit the book proportions.
+
+Current 1984 images:
+  FRONT_COVER_1984.jpeg: 736x952 (aspect: 0.773:1)
+  BACK_COVER_1984.jpeg: 736x952 (aspect: 0.773:1)
+  SPINE_1984.jpg: 490x2626 (aspect: 0.187:1)

@@ -1,0 +1,20 @@
+=== LOADING 1984 BOOK TEXTURES ===
+
+Processing FrontCover...
+  ↻ Reloaded existing image: FRONT_COVER_1984.jpeg
+  ✓ Applied to material: FrontCover
+  Image size: 736x952
+
+Processing BackCover...
+  ✓ Loaded new image: COVER_BABQ.jpg
+  ✓ Applied to material: BackCover
+  Image size: 1598x2560
+
+Processing Spine...
+  ↻ Reloaded existing image: SPINE_1984.jpg
+  ✓ Applied to material: Spine
+  Image size: 490x2626
+
+==================================================
+COMPLETE! Your book is ready to export to glTF.
+==================================================

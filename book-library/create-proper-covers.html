@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Proper Book Covers</title>
+    <script>
+        function generateImages() {
+            // Function to create and download canvas as PNG
+            function createAndDownload(width, height, color, filename) {
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = color;
+                ctx.fillRect(0, 0, width, height);
+
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+            }
+
+            // Universe in a Nutshell - Black spine and back
+            setTimeout(() => createAndDownload(200, 800, '#000000', 'UniverseInANutshell_Spine.png'), 100);
+            setTimeout(() => createAndDownload(600, 800, '#000000', 'UniverseInANutshell_BackCover.png'), 500);
+
+            // Brief Answers - White spine and back
+            setTimeout(() => createAndDownload(200, 800, '#FFFFFF', 'BriefAnswers_Spine.png'), 900);
+            setTimeout(() => createAndDownload(600, 800, '#FFFFFF', 'BriefAnswers_BackCover.png'), 1300);
+        }
+    </script>
+</head>
+<body>
+    <h1>Book Cover Generator</h1>
+    <p>Click the button to generate and download the cover images:</p>
+    <button onclick="generateImages()">Generate All Cover Images</button>
+
+    <h2>Files to Generate:</h2>
+    <ul>
+        <li>Universe in a Nutshell - Spine (200x800, black)</li>
+        <li>Universe in a Nutshell - Back Cover (600x800, black)</li>
+        <li>Brief Answers - Spine (200x800, white)</li>
+        <li>Brief Answers - Back Cover (600x800, white)</li>
+    </ul>
+
+    <p>After downloading, move the files to their respective folders:</p>
+    <ul>
+        <li>UniverseInANutshell_*.png → assets/books/UniverseInANutshell/</li>
+        <li>BriefAnswers_*.png → assets/books/BriefAnswersToBigQuestions/</li>
+    </ul>
+</body>
+</html>

@@ -1,68 +1,6 @@
 [
   {
     "id": 1,
-    "title": "Brief Answers to the Big Questions",
-    "author": "Stephen Hawking",
-    "genre": "Science, Non-fiction",
-    "category": "science",
-    "rating": "9/10",
-    "quote": "However difficult life may seem, there is always something you can do and succeed at.",
-    "description": "Stephen Hawking's final book addresses the biggest questions facing humanity.",
-    "coverImageURL": "assets/books/cover/COVER_BABQ.jpg"
-  },
-  {
-    "id": 2,
-    "title": "The Universe in a Nutshell",
-    "author": "Stephen Hawking",
-    "genre": "Science, Physics",
-    "category": "science",
-    "rating": "8/10",
-    "quote": "Imaginary time is a new dimension, at right angles to ordinary, real time.",
-    "description": "A journey through the universe's most fascinating concepts in physics."
-  },
-  {
-    "id": 3,
-    "title": "A Brief History of Time",
-    "author": "Stephen Hawking",
-    "genre": "Science, Cosmology",
-    "category": "science",
-    "rating": "10/10",
-    "quote": "If time travel is possible, where are the tourists from the future?",
-    "description": "The landmark volume on the frontier of scientific knowledge.",
-    "coverImageURL": "https://covers.openlibrary.org/b/id/7984916-L.jpg"
-  },
-  {
-    "id": 4,
-    "title": "IT",
-    "author": "Stephen King",
-    "genre": "Horror, Fiction",
-    "category": "horror",
-    "rating": "9/10",
-    "quote": "We all float down here.",
-    "description": "A terrifying tale of seven kids who face their worst nightmare."
-  },
-  {
-    "id": 5,
-    "title": "The Stand",
-    "author": "Stephen King",
-    "genre": "Horror, Post-apocalyptic",
-    "category": "horror",
-    "rating": "9/10",
-    "quote": "The place where you made your stand never mattered. Only that you were there... and still on your feet.",
-    "description": "An epic tale of good vs. evil in a post-apocalyptic world."
-  },
-  {
-    "id": 6,
-    "title": "Pet Sematary",
-    "author": "Stephen King",
-    "genre": "Horror, Thriller",
-    "category": "horror",
-    "rating": "8/10",
-    "quote": "Sometimes dead is better.",
-    "description": "A chilling story about the boundaries between life and death."
-  },
-  {
-    "id": 7,
     "title": "1984",
     "author": "George Orwell",
     "genre": "Dystopian, Political fiction",
@@ -70,67 +8,86 @@
     "rating": "10/10",
     "quote": "War is peace. Freedom is slavery. Ignorance is strength.",
     "description": "A dystopian masterpiece about totalitarian control and surveillance.",
-    "coverImageURL": "assets/books/cover/COVER_1984.jpeg"
+    "frontCoverURL": "assets/books/1984/FRONT_COVER_1984.jpeg",
+    "backCoverURL": "assets/books/1984/BACK_COVER_1984.jpeg",
+    "spineURL": "assets/books/1984/SPINE_1984.jpg"
   },
   {
-    "id": 8,
-    "title": "These Strange New Minds: How AI Learned to Talk and What It Means",
-    "author": "Christopher Summerfield",
-    "genre": "AI, Cognitive Science, Technology History",
-    "category": "ai",
-    "rating": "8/10",
-    "quote": "AI chatbots are error‑prone prediction engines that differ from humans in crucial ways.",
-    "description": "An exploration of how artificial intelligence developed language capabilities and its implications for humanity."
-  },
-  {
-    "id": 9,
-    "title": "Future‑Proof Yourself: An AI Era Survival Guide",
-    "author": "Taehoon Kim",
-    "genre": "AI, Popular Science",
-    "category": "ai",
-    "rating": "8/10",
-    "quote": "Designed for a general audience, the text avoids heavy technical jargon and presents complex ideas in clear, straightforward language.",
-    "description": "A practical guide to thriving in an age of artificial intelligence and technological disruption."
-  },
-  {
-    "id": 10,
-    "title": "Probabilistic Artificial Intelligence",
-    "author": "Andreas Krause & Jonas Hübotter",
-    "genre": "Machine Learning, Probabilistic Methods",
-    "category": "ai",
-    "rating": "8/10",
-    "quote": "A key aspect of intelligence is to not only make predictions, but reason about the uncertainty in these predictions.",
-    "description": "Advanced concepts in probabilistic approaches to artificial intelligence and machine learning."
-  },
-  {
-    "id": 11,
-    "title": "The Coming Wave: Technology, Power, and the Twenty‑first Century's Greatest Dilemma",
-    "author": "Mustafa Suleyman & Michael Bhaskar",
-    "genre": "AI Ethics, Risk, Policy",
-    "category": "ai",
-    "rating": "8/10",
-    "quote": "The same technologies that allow us to cure a disease could be used to cause one.",
-    "description": "An examination of emerging technologies and their potential risks and benefits for society."
-  },
-  {
-    "id": 12,
-    "title": "Continuous Discovery Habits: Discover Products that Create Customer Value and Business Value",
-    "author": "Teresa Torres",
-    "genre": "Product Management, UX Research, Business Strategy",
-    "category": "business",
+    "id": 2,
+    "title": "The Alchemist",
+    "author": "Paulo Coelho",
+    "genre": "Adventure, Quest, Philosophy",
+    "category": "fiction",
     "rating": "9/10",
-    "quote": "If you haven't had the good fortune to be coached by a strong leader or product coach, this book can help fill that gap and set you on the path to success.",
-    "description": "A comprehensive guide to building customer-centric products through continuous discovery practices."
+    "quote": "And, when you want something, all the universe conspires in helping you to achieve it.",
+    "description": "A magical story of Santiago, an Andalusian shepherd boy who yearns to travel in search of a worldly treasure.",
+    "frontCoverURL": "assets/books/The Alchemist/FrontCover.png",
+    "backCoverURL": "assets/books/The Alchemist/BackCover.png",
+    "spineURL": "assets/books/The Alchemist/Spine.png"
   },
   {
-    "id": 13,
-    "title": "Atomic Habits: An Easy & Proven Way to Build Good Habits & Break Bad Ones",
-    "author": "James Clear",
-    "genre": "Self‑Help, Behavioural Science, Productivity",
-    "category": "self-help",
+    "id": 3,
+    "title": "The Universe in a Nutshell",
+    "author": "Stephen Hawking",
+    "genre": "Science, Physics, Cosmology",
+    "category": "non-fiction",
+    "rating": "9.5/10",
+    "quote": "The universe doesn't allow perfection.",
+    "description": "A guide to the universe's most important theories, from quantum mechanics to M-theory, presented with Hawking's signature clarity.",
+    "frontCoverURL": "assets/books/UniverseInANutshell/FrontCover.jpeg",
+    "backCoverURL": "",
+    "spineURL": ""
+  },
+  {
+    "id": 4,
+    "title": "Pet Sematary",
+    "author": "Stephen King",
+    "genre": "Horror, Supernatural",
+    "category": "horror",
     "rating": "9/10",
-    "quote": "Goals are about the results you want. Systems are about the processes that lead to those results.",
-    "description": "A practical framework for building good habits and breaking bad ones through small, incremental changes.",
-    "coverImageURL": "https://covers.openlibrary.org/b/id/12583335-L.jpg"
+    "quote": "Sometimes dead is better.",
+    "description": "A chilling tale of a cursed burial ground that brings the dead back to life with terrifying consequences.",
+    "frontCoverURL": "assets/books/PetSematary/Front.png",
+    "backCoverURL": "assets/books/PetSematary/Back.png",
+    "spineURL": "assets/books/PetSematary/Spine.png"
+  },
+  {
+    "id": 5,
+    "title": "Brief Answers to the Big Questions",
+    "author": "Stephen Hawking",
+    "genre": "Science, Philosophy",
+    "category": "non-fiction",
+    "rating": "9/10",
+    "quote": "We are just an advanced breed of monkeys on a minor planet of a very average star. But we can understand the universe.",
+    "description": "Hawking's final thoughts on the biggest questions: Is there a God? Can we predict the future? Is time travel possible?",
+    "frontCoverURL": "assets/books/BriefAnswersToBigQuestions/FrontCover.jpg",
+    "backCoverURL": "",
+    "spineURL": ""
+  },
+  {
+    "id": 6,
+    "title": "Thinking, Fast and Slow",
+    "author": "Daniel Kahneman",
+    "genre": "Psychology, Behavioral Economics",
+    "category": "non-fiction",
+    "rating": "9.5/10",
+    "quote": "Nothing in life is as important as you think it is while you are thinking about it.",
+    "description": "A groundbreaking tour of the mind that explains the two systems that drive the way we think and make choices.",
+    "frontCoverURL": "assets/books/Thinking fast and slow/front.jpeg",
+    "backCoverURL": "assets/books/Thinking fast and slow/back copy.jpg",
+    "spineURL": "assets/books/Thinking fast and slow/spine.jpg"
+  },
+  {
+    "id": 7,
+    "title": "It",
+    "author": "Stephen King",
+    "genre": "Horror, Thriller",
+    "category": "horror",
+    "rating": "9/10",
+    "quote": "We all float down here.",
+    "description": "A group of kids face their fears when a shape-shifting entity emerges from the sewer every 27 years to prey on the town's children.",
+    "frontCoverURL": "assets/books/IT/Front.png",
+    "backCoverURL": "assets/books/IT/Back.png",
+    "spineURL": "assets/books/IT/Spine.png"
   }
 ]

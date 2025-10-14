@@ -40,7 +40,7 @@ class TerminalAnimation {
       },
       {
         type: 'help',
-        text: 'Available commands: contact, coding, library, stars, sailing',
+        text: 'Available commands: me, coding, library, stars',
         delay: 400
       },
       {
@@ -85,7 +85,7 @@ class TerminalAnimation {
       '<span class="red">ERROR: Build failed.</span>',
       '<span class="red">Reason: Developer went for coffee...</span>',
       '<span class="gray">>> Site still under construction.</span>',
-      '<span class="command-help">Available commands: contact, coding, library, stars, sailing</span>',
+      '<span class="command-help">Available commands: me, coding, library, stars</span>',
       '<span class="gray">Type a command to navigate:</span>'
     ];
 
@@ -312,11 +312,10 @@ class TerminalAnimation {
     inputLine.innerHTML = `<span class="blue">azitti@dev</span>:<span class="yellow">~</span>$ ${command}`;
 
     const commands = {
-      'contact': '/contact-me/index.html',
+      'me': '/contact-me/index.html',
       'coding': 'https://projects.zitti.ro',
       'library': '/book-library/index.html',
-      'stars': '/star-map/index.html',
-      'sailing': '/sailing/index.html'
+      'stars': '/star-map/index.html'
     };
 
     if (commands[command]) {
@@ -331,7 +330,7 @@ class TerminalAnimation {
       errorLine.innerHTML = `<span class="red">Command not found: ${command}</span>`;
 
       const helpLine = this.createLine();
-      helpLine.innerHTML = `<span class="gray">Available commands: contact, coding, library, stars, sailing</span>`;
+      helpLine.innerHTML = `<span class="gray">Available commands: me, coding, library, stars</span>`;
 
       // Re-enable input after error
       setTimeout(() => {

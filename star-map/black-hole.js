@@ -10,16 +10,16 @@ class BlackHoleMode {
     this.particleData = []; // Store physics data for each star
   }
 
-  enter() {
+  enter(initialX, initialY) {
     if (this.active) return;
     this.active = true;
 
     // Hide cursor and make black hole the cursor
     document.body.classList.add('black-hole-cursor');
 
-    // Initialize mouse at center
-    this.mouse.x = window.innerWidth / 2;
-    this.mouse.y = window.innerHeight / 2;
+    // Initialize mouse at button position (or default to center)
+    this.mouse.x = initialX !== undefined ? initialX : window.innerWidth / 2;
+    this.mouse.y = initialY !== undefined ? initialY : window.innerHeight / 2;
 
     // Convert existing stars to particles with physics
     if (typeof stars !== 'undefined') {

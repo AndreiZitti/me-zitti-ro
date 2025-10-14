@@ -429,41 +429,82 @@ animate();
 // PHASE 8: Black Hole Mode Integration
 // ============================================
 
+// Draw black hole icon on button
+function drawBlackHoleIcon() {
+  const iconCanvas = document.getElementById('black-hole-icon');
+  if (!iconCanvas) return;
+
+  const iconCtx = iconCanvas.getContext('2d');
+  const centerX = 30;
+  const centerY = 30;
+  const blackHoleMass = 10; // Same as initial mass in black-hole.js
+
+  // Clear canvas
+  iconCtx.clearRect(0, 0, 60, 60);
+
+  // Draw black hole (scaled down version of the actual black hole)
+  // Black core
+  iconCtx.beginPath();
+  iconCtx.arc(centerX, centerY, blackHoleMass, 0, 2 * Math.PI);
+  iconCtx.fillStyle = 'black';
+  iconCtx.fill();
+
+  // Event horizon ring
+  iconCtx.beginPath();
+  iconCtx.arc(centerX, centerY, blackHoleMass, 0, 2 * Math.PI);
+  iconCtx.strokeStyle = 'rgba(100, 50, 200, 0.6)';
+  iconCtx.lineWidth = 2;
+  iconCtx.stroke();
+
+  // Accretion disk glow
+  const gradient = iconCtx.createRadialGradient(
+    centerX, centerY, 0,
+    centerX, centerY, blackHoleMass * 3
+  );
+  gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+  gradient.addColorStop(0.5, 'rgba(100, 50, 200, 0.3)');
+  gradient.addColorStop(1, 'rgba(100, 50, 200, 0)');
+
+  iconCtx.beginPath();
+  iconCtx.arc(centerX, centerY, blackHoleMass * 3, 0, 2 * Math.PI);
+  iconCtx.fillStyle = gradient;
+  iconCtx.fill();
+}
+
+// Initialize black hole icon
+drawBlackHoleIcon();
+
 // Black hole mode toggle
 const blackHoleToggle = document.getElementById('black-hole-toggle');
+const blackHoleReset = document.getElementById('black-hole-reset');
 
-if (blackHoleToggle && typeof blackHole !== 'undefined') {
-  blackHoleToggle.addEventListener('click', () => {
-    if (blackHole.active) {
-      // Exit black hole mode
-      blackHole.exit();
-      blackHoleToggle.classList.remove('active');
+if (blackHoleToggle && blackHoleReset && typeof blackHole !== 'undefined') {
+  blackHoleToggle.addEventListener('click', (e) => {
+    // Get button position to spawn black hole there
+    const rect = blackHoleToggle.getBoundingClientRect();
+    const buttonCenterX = rect.left + rect.width / 2;
+    const buttonCenterY = rect.top + rect.height / 2;
+
+    // Enter black hole mode at button position
+    blackHole.enter(buttonCenterX, buttonCenterY);
+    blackHoleToggle.classList.add('active');
+    blackHoleToggle.classList.add('hidden');
+
+    // Show reset button
+    blackHoleReset.classList.remove('hidden');
+
+    // Hide toggle button for 3 seconds
+    setTimeout(() => {
       blackHoleToggle.classList.remove('hidden');
-    } else {
-      // Enter black hole mode
-      blackHole.enter();
-      blackHoleToggle.classList.add('active');
-      blackHoleToggle.classList.add('hidden');
-    }
+    }, 3000);
   });
 
-  // Track mouse to show button when hovering over button area
-  document.addEventListener('mousemove', (e) => {
-    if (blackHole.active) {
-      const buttonRect = blackHoleToggle.getBoundingClientRect();
-      const isOverButton = (
-        e.clientX >= buttonRect.left &&
-        e.clientX <= buttonRect.right &&
-        e.clientY >= buttonRect.top &&
-        e.clientY <= buttonRect.bottom
-      );
-
-      if (isOverButton) {
-        blackHoleToggle.classList.remove('hidden');
-      } else {
-        blackHoleToggle.classList.add('hidden');
-      }
-    }
+  // Reset button exits black hole mode
+  blackHoleReset.addEventListener('click', () => {
+    blackHole.exit();
+    blackHoleToggle.classList.remove('active');
+    blackHoleToggle.classList.remove('hidden');
+    blackHoleReset.classList.add('hidden');
   });
 
   // ESC key to exit black hole mode
@@ -472,6 +513,7 @@ if (blackHoleToggle && typeof blackHole !== 'undefined') {
       blackHole.exit();
       blackHoleToggle.classList.remove('active');
       blackHoleToggle.classList.remove('hidden');
+      blackHoleReset.classList.add('hidden');
     }
   });
 } else {

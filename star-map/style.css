@@ -249,6 +249,34 @@ body {
   width: 60px;
   height: 60px;
   border-radius: 50%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  z-index: 999;
+  transition: all 0.3s ease, opacity 0.3s ease;
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.black-hole-btn canvas {
+  display: block;
+  width: 60px;
+  height: 60px;
+}
+
+.black-hole-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Reset Button */
+.black-hole-reset-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
   background: rgba(20, 20, 40, 0.8);
   border: 2px solid rgba(100, 50, 200, 0.5);
   color: white;
@@ -257,12 +285,21 @@ body {
   z-index: 999;
   transition: all 0.3s ease, opacity 0.3s ease;
   backdrop-filter: blur(10px);
-  animation: pulse-glow 3s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.black-hole-btn.hidden {
+.black-hole-reset-btn.hidden {
   opacity: 0;
   pointer-events: none;
+}
+
+.black-hole-reset-btn:hover {
+  transform: scale(1.1);
+  background: rgba(50, 30, 80, 0.9);
+  border-color: rgba(100, 50, 200, 0.8);
+  box-shadow: 0 0 20px rgba(100, 50, 200, 0.6);
 }
 
 /* Black hole cursor mode */

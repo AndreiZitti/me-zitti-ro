@@ -6,7 +6,7 @@ class BookLibrary {
     this.books = [];
     this.currentFilters = ["all"];
     this.currentSort = "title";
-    this.booksPerShelf = 13; // Maximum books per shelf - forces overflow to second shelf
+    this.booksPerShelf = 20; // Maximum books per shelf
 
     this.init();
   }

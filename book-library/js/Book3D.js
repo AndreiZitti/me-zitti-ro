@@ -118,9 +118,12 @@ class Book3D {
                   }
                 );
               } else {
-                // Check for specific books that need custom colors
+                // Check for custom spine color or specific books that need custom colors
                 let spineColor = 0xe33c39; // Default red
-                if (this.bookData.title === "The Universe in a Nutshell") {
+                if (this.bookData.spineColor) {
+                  // Use custom color from data
+                  spineColor = parseInt(this.bookData.spineColor.replace('#', '0x'));
+                } else if (this.bookData.title === "The Universe in a Nutshell") {
                   spineColor = 0x000000; // Black for Universe in a Nutshell
                 } else if (this.bookData.title === "Brief Answers to the Big Questions") {
                   spineColor = 0xFFFFFF; // White for Brief Answers
@@ -175,12 +178,14 @@ class Book3D {
                     texture.colorSpace = THREE.SRGBColorSpace;
                     texture.wrapS = THREE.RepeatWrapping;
                     texture.wrapT = THREE.RepeatWrapping;
+                    texture.rotation = Math.PI; // Rotate 180 degrees to fix upside-down issue
+                    texture.center.set(0.5, 0.5); // Rotate around center
                     child.material = new THREE.MeshStandardMaterial({
                       map: texture,
                       roughness: 0.7,
                       metalness: 0.1
                     });
-                    console.log(`  ✅ TEXTURE applied to BACK COVER (Cube001)`);
+                    console.log(`  ✅ TEXTURE applied to BACK COVER (Cube001) - rotated 180°`);
                   },
                   undefined,
                   (error) => {
@@ -191,9 +196,12 @@ class Book3D {
                   }
                 );
               } else {
-                // Check for specific books that need custom colors
+                // Check for custom back color or specific books that need custom colors
                 let backColor = 0xe33c39; // Default red
-                if (this.bookData.title === "The Universe in a Nutshell") {
+                if (this.bookData.backColor) {
+                  // Use custom color from data
+                  backColor = parseInt(this.bookData.backColor.replace('#', '0x'));
+                } else if (this.bookData.title === "The Universe in a Nutshell") {
                   backColor = 0x000000; // Black for Universe in a Nutshell
                 } else if (this.bookData.title === "Brief Answers to the Big Questions") {
                   backColor = 0xFFFFFF; // White for Brief Answers

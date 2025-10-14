@@ -329,6 +329,16 @@ body.black-hole-cursor {
   }
 }
 
+/* Satellite Animation */
+.satellite {
+  position: fixed;
+  width: 20px;
+  height: auto;
+  z-index: 3;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .trip-star.large::before { width: 8px; height: 8px; }

@@ -1,0 +1,313 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000000;
+  font-family: 'Arial', sans-serif;
+  color: white;
+  opacity: 0;
+  animation: fadeIn 1s ease-in forwards;
+  animation-delay: 0.5s;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+#starfield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  will-change: contents;
+}
+
+#nebulae-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Trip Star Styling */
+.trip-star {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: all 0.3s ease;
+}
+
+/* The star itself - small, bright dot */
+.trip-star::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: white;
+  box-shadow:
+    0 0 10px var(--star-color),
+    0 0 20px var(--star-color),
+    0 0 30px rgba(var(--star-color-rgb), 0.4);
+  animation: star-pulse 3s ease-in-out infinite;
+}
+
+/* Size variations */
+.trip-star.large::before {
+  width: 10px;
+  height: 10px;
+}
+
+.trip-star.medium::before {
+  width: 8px;
+  height: 8px;
+}
+
+.trip-star.small::before {
+  width: 6px;
+  height: 6px;
+}
+
+/* Subtle pulsing animation */
+@keyframes star-pulse {
+  0%, 100% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+}
+
+/* Stagger the animations */
+.trip-star:nth-child(1)::before { animation-delay: 0s; }
+.trip-star:nth-child(2)::before { animation-delay: 0.6s; }
+.trip-star:nth-child(3)::before { animation-delay: 1.2s; }
+.trip-star:nth-child(4)::before { animation-delay: 1.8s; }
+.trip-star:nth-child(5)::before { animation-delay: 2.4s; }
+
+/* Hover state - subtle ring appears */
+.trip-star:hover::before {
+  box-shadow:
+    0 0 15px var(--star-color),
+    0 0 30px var(--star-color),
+    0 0 45px rgba(var(--star-color-rgb), 0.6);
+}
+
+.trip-star::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--star-color);
+  opacity: 0;
+  transition: all 0.4s ease;
+}
+
+.trip-star:hover::after {
+  width: 50px;
+  height: 50px;
+  opacity: 0.4;
+}
+
+/* Title on hover */
+.trip-star-title {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  text-shadow: 0 0 10px rgba(0,0,0,0.8);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.trip-star:hover .trip-star-title {
+  opacity: 1;
+}
+
+/* Modal Styling */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.modal.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-content {
+  background: rgba(20, 20, 40, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+  font-size: 28px;
+}
+
+.modal-content p {
+  margin-bottom: 15px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+#modal-notes {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-style: italic;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.close-btn:hover {
+  opacity: 1;
+}
+
+/* Photo Gallery */
+.photo-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.photo-gallery img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.photo-gallery img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+}
+
+/* Black Hole Mode Button */
+.black-hole-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(20, 20, 40, 0.8);
+  border: 2px solid rgba(100, 50, 200, 0.5);
+  color: white;
+  font-size: 32px;
+  cursor: pointer;
+  z-index: 999;
+  transition: all 0.3s ease, opacity 0.3s ease;
+  backdrop-filter: blur(10px);
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.black-hole-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Black hole cursor mode */
+body.black-hole-cursor {
+  cursor: none;
+}
+
+.black-hole-btn:hover {
+  transform: scale(1.1);
+  background: rgba(50, 30, 80, 0.9);
+  border-color: rgba(100, 50, 200, 0.8);
+  box-shadow: 0 0 20px rgba(100, 50, 200, 0.6);
+}
+
+.black-hole-btn.active {
+  background: rgba(100, 50, 200, 0.9);
+  border-color: rgba(150, 100, 255, 1);
+  box-shadow: 0 0 30px rgba(100, 50, 200, 0.8);
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(100, 50, 200, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(100, 50, 200, 0.6);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .trip-star.large::before { width: 8px; height: 8px; }
+  .trip-star.medium::before { width: 6px; height: 6px; }
+  .trip-star.small::before { width: 5px; height: 5px; }
+
+  .modal-content {
+    max-width: 90%;
+    padding: 30px 20px;
+  }
+
+  .modal-content h2 {
+    font-size: 22px;
+  }
+
+  .modal-content p {
+    font-size: 14px;
+  }
+}

@@ -1,334 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Interactive Star Map</title>
-    <style>
-      /* ——  layout  —— */
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        background: #000;
-        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-        color: #fff;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stargazing Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Canvas for star background -->
+  <canvas id="starfield"></canvas>
 
-      /* Back Navigation */
-      .back-nav {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        z-index: 1000;
-      }
+  <!-- Container for nebulae (trips) -->
+  <div id="nebulae-container"></div>
 
-      .back-link {
-        display: inline-block;
-        color: #fff;
-        text-decoration: none;
-        padding: 12px 20px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 25px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-      }
+  <!-- Black Hole Mode Toggle Button -->
+  <button id="black-hole-toggle" class="black-hole-btn" title="Toggle Black Hole Mode">
+    🕳️
+  </button>
 
-      .back-link:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      }
-
-      /* ——  star map container  —— */
-      #starMapContainer {
-        height: 100vh;
-        position: relative;
-        overflow: hidden;
-      }
-
-      /* ——  trip info section  —— */
-      #tripInfo {
-        padding: 4rem 2rem;
-        background: linear-gradient(
-          135deg,
-          #1a1a2e 0%,
-          #16213e 50%,
-          #0f0f23 100%
-        );
-        min-height: 60vh;
-      }
-
-      .trip-content {
-        max-width: 800px;
-        margin: 0 auto;
-        text-align: center;
-      }
-
-      .trip-content h2 {
-        font-size: 2.5rem;
-        margin-bottom: 2rem;
-        background: linear-gradient(45deg, #ffffff, #a8e6cf);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      .trip-details {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 2rem;
-        margin: 3rem 0;
-      }
-
-      .detail-card {
-        background: rgba(255, 255, 255, 0.1);
-        padding: 2rem;
-        border-radius: 12px;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-      }
-
-      .detail-card h3 {
-        color: #a8e6cf;
-        margin-bottom: 1rem;
-        font-size: 1.3rem;
-      }
-
-      .detail-card p {
-        font-size: 1.1rem;
-        line-height: 1.6;
-        margin: 0;
-      }
-
-      .instagram-link {
-        display: inline-block;
-        margin-top: 3rem;
-        padding: 1rem 2rem;
-        background: linear-gradient(45deg, #e1306c, #fd1d1d, #f77737, #fcaf45);
-        color: white;
-        text-decoration: none;
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 1.1rem;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-
-      .instagram-link:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(225, 48, 108, 0.4);
-      }
-
-      /* ——  info panel  —— */
-      #infoPanel {
-        position: absolute;
-        top: 10%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60%;
-        max-width: 600px;
-        padding: 1rem 1.25rem;
-        border-radius: 8px;
-        background: rgba(0, 0, 0, 0.82);
-        backdrop-filter: blur(6px);
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
-        display: none; /* toggled on pin click */
-      }
-      #infoPanel h2 {
-        margin: 0 0 0.5rem;
-        font-size: 1.4rem;
-        font-weight: 600;
-      }
-      #closeBtn {
-        float: right;
-        cursor: pointer;
-        font-size: 1.2rem;
-        line-height: 1;
-        margin-left: 0.5rem;
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Back Navigation -->
-    <nav class="back-nav">
-      <a href="/index.html" class="back-link">← Back to Terminal</a>
-    </nav>
-
-    <!-- Star map container -->
-    <div id="starMapContainer">
-      <!--  Slide‑in info panel  -->
-      <div id="infoPanel">
-        <span id="closeBtn">✕</span>
-        <h2 id="title"></h2>
-        <p id="content"></p>
-      </div>
+  <!-- Modal for trip details -->
+  <div id="trip-modal" class="modal hidden">
+    <div class="modal-content">
+      <button class="close-btn">&times;</button>
+      <h2 id="modal-title"></h2>
+      <p id="modal-date"></p>
+      <p id="modal-location"></p>
+      <p id="modal-photos"></p>
+      <div id="modal-gallery" class="photo-gallery"></div>
+      <p id="modal-notes"></p>
     </div>
+  </div>
 
-    <!-- Trip information section -->
-    <section id="tripInfo">
-      <div class="trip-content">
-        <h2>Upcoming Astronomical Adventure</h2>
-
-        <div class="trip-details">
-          <div class="detail-card">
-            <h3>📅 Date</h3>
-            <p>August 20th</p>
-          </div>
-
-          <div class="detail-card">
-            <h3>📍 Location</h3>
-            <p>Winkelmoosalm</p>
-          </div>
-
-          <div class="detail-card">
-            <h3>🌌 What We'll See</h3>
-            <p>Horse Nebula<br /><em>Dark nebula in Orion</em></p>
-          </div>
-        </div>
-
-        <a
-          href="https://instagram.com"
-          class="instagram-link"
-          target="_blank"
-          rel="noopener"
-        >
-          📸 Follow the Journey on Instagram
-        </a>
-      </div>
-    </section>
-
-    <!--  Three.js  -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-    <script>
-      function initStarMap() {
-        if (typeof THREE === "undefined") {
-          document.body.innerHTML =
-            '<div style="padding:4rem;text-align:center;color:#fff">⚠️ Three.js failed to load. Check your connection and refresh.</div>';
-          return;
-        }
-
-        /* ——  data  —— */
-        const entries = [
-          {
-            title: "North America Nebula",
-            ra: "20h 59m 17.1s",
-            dec: "+44°31'44″",
-            x: -100,
-            y: 50,
-            content: `An emission nebula in Cygnus whose outline resembles North America.<br>It spans an area more than ten times the full Moon and lies about 2 590&nbsp;light‑years away.`,
-          },
-          {
-            title: "M13 – Great Globular Cluster",
-            ra: "16h 41m 41.24s",
-            dec: "+36°27'35.5″",
-            x: 40,
-            y: 20,
-            content: `A globular cluster of several hundred&nbsp;thousand stars.<br>Discovered by Edmond Halley, it is visible as a fuzzy patch under dark skies and lies ~22 000&nbsp;light‑years away.`,
-          },
-          {
-            title: "M81 – Bode's Galaxy",
-            ra: "09h 55m 33.2s",
-            dec: "+69°03'55″",
-            x: 120,
-            y: -60,
-            content: `A grand‑design spiral galaxy about 12 million&nbsp;light‑years away.<br>Its active nucleus hosts a 70‑million‑solar‑mass black hole.`,
-          },
-        ];
-
-        /* ——  three.js setup  —— */
-        const container = document.getElementById("starMapContainer");
-        const containerWidth = container.clientWidth;
-        const containerHeight = container.clientHeight;
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(
-          60,
-          containerWidth / containerHeight,
-          1,
-          1000
-        );
-        camera.position.z = 400;
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(containerWidth, containerHeight);
-        // ensure colors look the same as in sRGB PNG
-        renderer.outputColorSpace = THREE.SRGBColorSpace;
-        container.appendChild(renderer.domElement);
-
-        // star‑field background
-        const loader = new THREE.TextureLoader();
-        const bgTexture = loader.load("images/starfield.png", () => {
-          bgTexture.colorSpace = THREE.SRGBColorSpace;
-          const plane = new THREE.Mesh(
-            new THREE.PlaneGeometry(800, 400),
-            new THREE.MeshBasicMaterial({ map: bgTexture })
-          );
-          scene.add(plane);
-        });
-
-        /* ——  pin sprites  —— */
-        const pinMaterial = new THREE.SpriteMaterial({ color: 0xffffff });
-        entries.forEach((e) => {
-          const sprite = new THREE.Sprite(pinMaterial.clone());
-          sprite.position.set(e.x, e.y, 1);
-          sprite.scale.set(10, 10, 1);
-          sprite.userData = e;
-          scene.add(sprite);
-        });
-
-        /* ——  interaction  —— */
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-
-        function onClick(ev) {
-          const rect = container.getBoundingClientRect();
-          mouse.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
-          mouse.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
-          raycaster.setFromCamera(mouse, camera);
-          const hit = raycaster.intersectObjects(scene.children)[0];
-          if (hit && hit.object.userData) {
-            const { title, content } = hit.object.userData;
-            const panel = document.getElementById("infoPanel");
-            document.getElementById("title").textContent = title;
-            document.getElementById("content").innerHTML = content;
-            panel.style.opacity = 0;
-            panel.style.display = "block";
-            (function fade() {
-              const val = parseFloat(panel.style.opacity) || 0;
-              if (val < 1) {
-                panel.style.opacity = val + 0.06;
-                requestAnimationFrame(fade);
-              }
-            })();
-          }
-        }
-        document.addEventListener("click", onClick);
-        document.getElementById("closeBtn").addEventListener("click", () => {
-          document.getElementById("infoPanel").style.display = "none";
-        });
-
-        /* ——  handle resize  —— */
-        window.addEventListener("resize", () => {
-          const newWidth = container.clientWidth;
-          const newHeight = container.clientHeight;
-          camera.aspect = newWidth / newHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize(newWidth, newHeight);
-        });
-
-        (function animate() {
-          requestAnimationFrame(animate);
-          renderer.render(scene, camera);
-        })();
-      }
-
-      // run after DOM
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initStarMap);
-      } else {
-        initStarMap();
-      }
-    </script>
-  </body>
+  <script src="trips-data.js"></script>
+  <script src="black-hole.js"></script>
+  <script src="script.js"></script>
+</body>
 </html>

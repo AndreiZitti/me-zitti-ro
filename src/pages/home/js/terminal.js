@@ -312,10 +312,10 @@ class TerminalAnimation {
     inputLine.innerHTML = `<span class="blue">azitti@dev</span>:<span class="yellow">~</span>$ ${command}`;
 
     const commands = {
-      'me': '/contact-me/index.html',
+      'me': 'pages/contact/index.html',
       'coding': 'https://projects.zitti.ro',
-      'library': '/book-library/index.html',
-      'stars': '/star-map/index.html'
+      'library': 'pages/book-library/index.html',
+      'stars': 'pages/star-map/index.html'
     };
 
     if (commands[command]) {

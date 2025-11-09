@@ -2,6 +2,10 @@
 // PHASE 3: Canvas Star Field
 // ============================================
 
+//TODO: REFRACTOTOR TO ANOTHER PAGE ( THE DETAIL VIEW)
+//TODO: REFRATOR ANIMATION LOGIC INTO SMALLER COMPONENTS
+
+
 const canvas = document.getElementById('starfield');
 const ctx = canvas.getContext('2d');
 
@@ -11,6 +15,18 @@ let mouseX = 0;
 let mouseY = 0;
 let shootingStars = [];
 let rotation = 0; // Canvas rotation in degrees
+
+// Transition state management for hyperdrive zoom
+const transitionState = {
+  active: false,
+  mode: null, // 'zooming-in', 'viewing', 'zooming-out'
+  targetX: 0,
+  targetY: 0,
+  progress: 0, // 0 to 1
+  duration: 1200, // milliseconds
+  startTime: 0,
+  currentTrip: null
+};
 
 // Resize canvas to window
 function resizeCanvas() {
@@ -87,27 +103,6 @@ function drawAtmosphere() {
   ctx.fillStyle = milkyWayGradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // 2. Purple nebula cloud - top-right (no glow in middle)
-  const purpleX = canvas.width * 0.7;
-  const purpleY = canvas.height * 0.3;
-  const purpleGradient = ctx.createRadialGradient(purpleX, purpleY, 100, purpleX, purpleY, 500);
-  purpleGradient.addColorStop(0, 'rgba(139, 92, 246, 0.015)');
-  purpleGradient.addColorStop(0.5, 'rgba(139, 92, 246, 0.008)');
-  purpleGradient.addColorStop(1, 'rgba(139, 92, 246, 0)');
-
-  ctx.fillStyle = purpleGradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // 3. Teal nebula cloud - bottom-left (no glow in middle)
-  const tealX = canvas.width * 0.25;
-  const tealY = canvas.height * 0.75;
-  const tealGradient = ctx.createRadialGradient(tealX, tealY, 80, tealX, tealY, 350);
-  tealGradient.addColorStop(0, 'rgba(80, 200, 200, 0.012)');
-  tealGradient.addColorStop(0.5, 'rgba(80, 200, 200, 0.006)');
-  tealGradient.addColorStop(1, 'rgba(80, 200, 200, 0)');
-
-  ctx.fillStyle = tealGradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 // Shooting star functions
@@ -234,10 +229,127 @@ function updateStars() {
   });
 }
 
+// Easing function for smooth acceleration (zoom in keeps accelerating)
+function easeInCubic(t) {
+  return t * t * t;
+}
+
+// Update transition physics for hyperdrive zoom
+function updateTransition() {
+  const now = Date.now();
+  const elapsed = now - transitionState.startTime;
+  const rawProgress = Math.min(elapsed / transitionState.duration, 1);
+  transitionState.progress = rawProgress;
+
+  if (transitionState.mode === 'zooming-in' || transitionState.mode === 'zooming-out') {
+    const isZoomingIn = transitionState.mode === 'zooming-in';
+    const effectiveProgress = isZoomingIn ? transitionState.progress : (1 - transitionState.progress);
+
+    // Use cubic easing for acceleration curve
+    const easedProgress = easeInCubic(effectiveProgress);
+
+    stars.forEach(star => {
+      // Calculate angle from star to vanishing point
+      const dx = star.x - transitionState.targetX;
+      const dy = star.y - transitionState.targetY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const angle = Math.atan2(dy, dx);
+
+      // Layer speed multipliers
+      let speedMultiplier = 1;
+      if (star.layer === 2) speedMultiplier = 2;
+      if (star.layer === 3) speedMultiplier = 3;
+
+      // Move star away from vanishing point (hyperdrive effect)
+      // Smoother acceleration curve
+      const baseSpeed = 6;
+      const acceleration = 1 + easedProgress * 2.5; // Up to 3.5x faster, smoother curve
+      const speed = baseSpeed * speedMultiplier * acceleration;
+      star.x += Math.cos(angle) * speed * (isZoomingIn ? 1 : -1);
+      star.y += Math.sin(angle) * speed * (isZoomingIn ? 1 : -1);
+
+      // Progressive fade with steeper curve at 70% mark
+      let fadeAmount = easedProgress * 0.5; // Max 50% fade, smoother
+      if (easedProgress > 0.7) {
+        fadeAmount = 0.35 + (easedProgress - 0.7) * 1.5;
+      }
+      star.opacity = star.baseOpacity * (1 - fadeAmount);
+
+      // Recycle stars that go off-screen - smoother respawn
+      const margin = 100;
+      if (star.x < -margin || star.x > canvas.width + margin ||
+          star.y < -margin || star.y > canvas.height + margin) {
+        // Respawn at vanishing point with small offset - this prevents the "pop" effect
+        const respawnDistance = 20 + Math.random() * 30; // Smaller, more consistent spawn radius
+        const respawnAngle = Math.random() * Math.PI * 2;
+        star.x = transitionState.targetX + Math.cos(respawnAngle) * respawnDistance;
+        star.y = transitionState.targetY + Math.sin(respawnAngle) * respawnDistance;
+        star.opacity = 0; // Start invisible and fade in
+      }
+    });
+
+    // Check if transition is complete
+    if (transitionState.progress >= 1) {
+      if (isZoomingIn) {
+        // Switch to viewing mode
+        transitionState.mode = 'viewing';
+        showDetailView();
+      } else {
+        // Exit transition completely
+        transitionState.active = false;
+        transitionState.mode = null;
+        transitionState.currentTrip = null;
+        // Regenerate stars to reset positions
+        stars.length = 0;
+        generateStars();
+      }
+    }
+  } else if (transitionState.mode === 'viewing') {
+    // Keep parallax running during viewing, just with dimmed stars
+    time += 0.01;
+
+    // Slow rotation continues
+    rotation += 0.1 / 60 / 60;
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const rotRad = (rotation * Math.PI) / 180;
+
+    stars.forEach(star => {
+      // Keep dimmed but visible
+      const twinkle = Math.sin(time * star.twinkleSpeed) * 0.15;
+      star.opacity = (star.baseOpacity * 0.5) + twinkle; // 50% opacity with subtle twinkle
+      star.opacity = Math.max(0, Math.min(1, star.opacity));
+
+      // Apply rotation to base position
+      const relX = star.baseX - centerX;
+      const relY = star.baseY - centerY;
+      const rotatedX = relX * Math.cos(rotRad) - relY * Math.sin(rotRad);
+      const rotatedY = relX * Math.sin(rotRad) + relY * Math.cos(rotRad);
+      const newBaseX = rotatedX + centerX;
+      const newBaseY = rotatedY + centerY;
+
+      // Parallax movement (slightly reduced)
+      let parallaxAmount = 0;
+      if (star.layer === 1) parallaxAmount = 3;   // Reduced from 5
+      if (star.layer === 2) parallaxAmount = 10;  // Reduced from 15
+      if (star.layer === 3) parallaxAmount = 20;  // Reduced from 30
+
+      // Smooth lerp
+      const targetX = newBaseX + mouseX * parallaxAmount;
+      const targetY = newBaseY + mouseY * parallaxAmount;
+
+      star.x += (targetX - star.x) * 0.08; // Slightly slower lerp
+      star.y += (targetY - star.y) * 0.08;
+    });
+  }
+}
+
 // Animation loop
 function animate() {
-  // If black hole mode is active, use black hole physics instead of normal updates
-  if (blackHole && blackHole.active) {
+  if (transitionState.active) {
+    updateTransition(); // Handle zoom transition
+  } else if (blackHole && blackHole.active) {
     blackHole.update();
   } else {
     updateStars();
@@ -307,19 +419,16 @@ function createTripStars() {
     title.textContent = trip.title;
     star.appendChild(title);
 
-    // Click handler (same as before)
-    star.addEventListener('click', () => showTripDetails(trip));
+    // Click handler - pass event for position
+    star.addEventListener('click', (e) => showTripDetails(trip, e));
 
     nebulaContainer.appendChild(star);
   });
 }
 
 // ============================================
-// PHASE 6: Trip Details Modal
+// PHASE 6: Trip Details with Zoom Transition
 // ============================================
-
-const modal = document.getElementById('trip-modal');
-const closeBtn = modal.querySelector('.close-btn');
 
 // Load photos for a trip folder
 async function loadTripPhotos(folderName) {
@@ -349,23 +458,84 @@ async function loadTripPhotos(folderName) {
   return photos;
 }
 
-async function showTripDetails(trip) {
-  // Populate content
-  document.getElementById('modal-title').textContent = trip.title;
-  document.getElementById('modal-date').textContent = `📅 ${trip.date}`;
-  document.getElementById('modal-location').textContent = `📍 ${trip.location}`;
-  document.getElementById('modal-photos').textContent = `📸 ${trip.photoCount} photos`;
-  document.getElementById('modal-notes').textContent = trip.notes;
+// Start zoom transition to trip details
+async function showTripDetails(trip, event) {
+  // Prevent action if already transitioning
+  if (transitionState.active) return;
 
-  // Load and display photos
-  const gallery = document.getElementById('modal-gallery');
-  gallery.innerHTML = '<p style="opacity: 0.6;">Loading photos...</p>';
+  // Get clicked star's position
+  const starElement = event.currentTarget;
+  const rect = starElement.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
 
+  // Disable black hole mode if active
+  if (blackHole && blackHole.active) {
+    blackHole.exit();
+    document.getElementById('black-hole-toggle')?.classList.remove('active');
+    document.getElementById('black-hole-reset')?.classList.add('hidden');
+  }
+
+  // Fade out OTHER trip stars, but keep the clicked one visible
+  const nebulaContainer = document.getElementById('nebulae-container');
+  const allTripStars = nebulaContainer.querySelectorAll('.trip-star');
+  allTripStars.forEach(star => {
+    if (star !== starElement) {
+      star.style.opacity = '0';
+      star.style.transition = 'opacity 0.5s ease';
+    } else {
+      // Keep clicked star visible and brighten it
+      star.style.transition = 'transform 1.2s ease, opacity 0.8s ease';
+      star.style.transform = 'translate(-50%, -50%) scale(2)';
+      star.style.opacity = '1';
+      star.style.zIndex = '1000';
+    }
+  });
+  nebulaContainer.classList.add('transitioning');
+
+  // Set transition state
+  transitionState.active = true;
+  transitionState.mode = 'zooming-in';
+  transitionState.targetX = centerX;
+  transitionState.targetY = centerY;
+  transitionState.startTime = Date.now();
+  transitionState.progress = 0;
+  transitionState.currentTrip = trip;
+
+  // Animation loop will handle the zoom
+}
+
+//TODO: REFRACTOTOR TO ANOTHER PAGE ( THE DETAIL VIEW)
+
+// Show detail view (called when zoom completes)
+async function showDetailView() {
+  const trip = transitionState.currentTrip;
+  if (!trip) return;
+
+  // Populate detail view content
+  document.getElementById('detail-title').textContent = trip.title;
+  document.getElementById('detail-date').textContent = `📅 ${trip.date}`;
+  document.getElementById('detail-location').textContent = `📍 ${trip.location}`;
+  document.getElementById('detail-notes').textContent = trip.notes;
+
+  // Load photos
   const photos = await loadTripPhotos(trip.folder);
 
-  gallery.innerHTML = '';
+  // Set hero image (use first photo or placeholder)
+  const heroImg = document.getElementById('detail-hero-img');
   if (photos.length > 0) {
-    photos.forEach(photoPath => {
+    heroImg.src = photos[0];
+    heroImg.alt = trip.title;
+  } else {
+    heroImg.style.display = 'none';
+  }
+
+  // Populate gallery with remaining photos
+  const gallery = document.getElementById('detail-gallery');
+  gallery.innerHTML = '';
+
+  if (photos.length > 1) {
+    photos.slice(1).forEach(photoPath => {
       const img = document.createElement('img');
       img.src = photoPath;
       img.alt = trip.title;
@@ -375,34 +545,41 @@ async function showTripDetails(trip) {
       });
       gallery.appendChild(img);
     });
-  } else {
-    gallery.innerHTML = '<p style="opacity: 0.6;">No photos available</p>';
   }
 
-  // Show modal
-  modal.classList.remove('hidden');
+  // Show detail view with fade
+  const detailView = document.getElementById('trip-detail-view');
+  detailView.classList.remove('hidden');
 }
 
-function hideModal() {
-  modal.classList.add('hidden');
+// Start zoom-out transition and hide detail view
+function hideDetailView() {
+  // Fade out detail view
+  const detailView = document.getElementById('trip-detail-view');
+  detailView.classList.add('hidden');
+
+  // Start zoom-out after brief delay
+  setTimeout(() => {
+    transitionState.mode = 'zooming-out';
+    transitionState.startTime = Date.now();
+    transitionState.progress = 0;
+
+    // Fade all trip stars back in
+    const nebulaContainer = document.getElementById('nebulae-container');
+    const allTripStars = nebulaContainer.querySelectorAll('.trip-star');
+    allTripStars.forEach(star => {
+      star.style.opacity = '1';
+      star.style.transform = 'translate(-50%, -50%) scale(1)';
+      star.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+      star.style.zIndex = '';
+    });
+
+    // Re-enable interactions after zoom-out completes
+    setTimeout(() => {
+      nebulaContainer.classList.remove('transitioning');
+    }, transitionState.duration);
+  }, 300);
 }
-
-// Close button
-closeBtn.addEventListener('click', hideModal);
-
-// Click outside modal to close
-modal.addEventListener('click', (e) => {
-  if (e.target === modal) {
-    hideModal();
-  }
-});
-
-// ESC key to close
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-    hideModal();
-  }
-});
 
 // ============================================
 // PHASE 7: Initialization & Optimization
@@ -424,6 +601,36 @@ resizeCanvas();
 generateStars();
 createTripStars();
 animate();
+
+// Detail view event handlers
+const closeDetailBtn = document.getElementById('close-detail');
+if (closeDetailBtn) {
+  closeDetailBtn.addEventListener('click', hideDetailView);
+}
+
+// ESC key to close detail view or black hole mode
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    // Close detail view if open
+    const detailView = document.getElementById('trip-detail-view');
+    if (detailView && !detailView.classList.contains('hidden')) {
+      hideDetailView();
+    }
+    // Or exit black hole mode
+    else if (blackHole && blackHole.active) {
+      blackHole.exit();
+      const blackHoleToggle = document.getElementById('black-hole-toggle');
+      const blackHoleReset = document.getElementById('black-hole-reset');
+      if (blackHoleToggle) {
+        blackHoleToggle.classList.remove('active');
+        blackHoleToggle.classList.remove('hidden');
+      }
+      if (blackHoleReset) {
+        blackHoleReset.classList.add('hidden');
+      }
+    }
+  }
+});
 
 // ============================================
 // PHASE 8: Black Hole Mode Integration
@@ -505,16 +712,6 @@ if (blackHoleToggle && blackHoleReset && typeof blackHole !== 'undefined') {
     blackHoleToggle.classList.remove('active');
     blackHoleToggle.classList.remove('hidden');
     blackHoleReset.classList.add('hidden');
-  });
-
-  // ESC key to exit black hole mode
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && blackHole.active) {
-      blackHole.exit();
-      blackHoleToggle.classList.remove('active');
-      blackHoleToggle.classList.remove('hidden');
-      blackHoleReset.classList.add('hidden');
-    }
   });
 } else {
   console.warn('Black hole mode not available - blackHole object not found');

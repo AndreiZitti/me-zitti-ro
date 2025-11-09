@@ -7,7 +7,7 @@
     "dev": "live-server src --port=3000 --open",
     "start": "npm run dev",
     "build": "npm run build:css && npm run build:js && npm run build:assets",
-    "build:css": "postcss src/pages/home/css/*.css --dir dist/css --use autoprefixer cssnano --config config/postcss.config.js",
+    "build:css": "postcss 'src/pages/**/css/*.css' --base src --dir dist --use autoprefixer cssnano --config config/postcss.config.js",
     "build:js": "terser src/pages/home/js/*.js --compress --mangle --output dist/js/bundle.min.js",
     "build:assets": "cpx 'src/**/*' dist/",
     "preview": "live-server dist --port=3001 --open",

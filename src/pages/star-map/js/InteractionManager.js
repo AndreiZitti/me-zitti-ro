@@ -26,18 +26,20 @@ export class InteractionManager {
     // Or just import it here.
   }
   
-  // Called from main with data
+  // Called from main with data - returns array of created elements
   createTripStars(tripsData) {
     const container = document.getElementById('nebulae-container');
     container.innerHTML = ''; // Clear existing
+    const tripElements = [];
 
     tripsData.forEach(trip => {
       const star = document.createElement('div');
       star.className = `trip-star ${trip.size}`;
+      star.dataset.tripId = trip.id;
       star.style.left = `${trip.position.x}%`;
       star.style.top = `${trip.position.y}%`;
       star.style.setProperty('--star-color', trip.color);
-      
+
       // Hex to RGB for glow
       const rgb = this.hexToRgb(trip.color);
       star.style.setProperty('--star-color-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
@@ -52,7 +54,10 @@ export class InteractionManager {
       });
 
       container.appendChild(star);
+      tripElements.push(star);
     });
+
+    return tripElements;
   }
 
   hexToRgb(hex) {

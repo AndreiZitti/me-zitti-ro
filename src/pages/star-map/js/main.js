@@ -3,6 +3,7 @@ import { SatelliteManager } from './SatelliteManager.js';
 import { BlackHoleManager } from './BlackHoleManager.js';
 import { TransitionManager } from './TransitionManager.js';
 import { InteractionManager } from './InteractionManager.js';
+import { ConstellationManager } from './ConstellationManager.js';
 
 // Import data (assuming we can import it, or we'll fetch it)
 // For now, let's just inline the data or fetch it if we convert it to JSON.
@@ -89,9 +90,12 @@ class StarMapApp {
     this.blackHoleManager = new BlackHoleManager('starfield');
     this.transitionManager = new TransitionManager(this.starField);
     this.interactionManager = new InteractionManager(this.starField, this.transitionManager);
+    this.constellationManager = new ConstellationManager();
 
-    this.interactionManager.createTripStars(tripsData);
-    
+    // Create trip stars and initialize constellation lines
+    const tripElements = this.interactionManager.createTripStars(tripsData);
+    this.constellationManager.initialize(tripElements);
+
     this.animate();
   }
 
@@ -103,11 +107,18 @@ class StarMapApp {
     } else {
       this.starField.update(this.interactionManager.mouseX, this.interactionManager.mouseY);
       this.satelliteManager.update(null);
+
+      // Update constellation lines and hub position with parallax
+      this.constellationManager.updateHubPosition(
+        this.interactionManager.mouseX,
+        this.interactionManager.mouseY
+      );
+      this.constellationManager.update();
     }
 
     // 2. Draw
     this.starField.draw();
-    
+
     if (this.blackHoleManager.active) {
       this.blackHoleManager.draw();
     }

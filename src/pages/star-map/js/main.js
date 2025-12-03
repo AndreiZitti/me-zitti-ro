@@ -19,7 +19,8 @@ const tripsData = [
     color: "#E8E8E8",
     position: { x: 20, y: 30 },
     size: "large",
-    folder: "Moon"
+    folder: "Moon",
+    shape: "crescent-moon"
   },
   {
     id: "sun",
@@ -31,7 +32,8 @@ const tripsData = [
     color: "#FFA500",
     position: { x: 75, y: 15 },
     size: "large",
-    folder: "Sun"
+    folder: "Sun",
+    shape: "sun"
   },
   {
     id: "trip1",
@@ -55,7 +57,8 @@ const tripsData = [
     color: "#3A86FF",
     position: { x: 82, y: 58 },
     size: "medium",
-    folder: "Trip2"
+    folder: "Trip2",
+    shape: "star-cluster"
   },
   {
     id: "trip3",
@@ -67,7 +70,8 @@ const tripsData = [
     color: "#06FFA5",
     position: { x: 12, y: 75 },
     size: "small",
-    folder: "Trip3"
+    folder: "Trip3",
+    shape: "spiral-galaxy"
   },
   {
     id: "ngc891",
@@ -79,7 +83,8 @@ const tripsData = [
     color: "#7B68EE",
     position: { x: 35, y: 42 },
     size: "medium",
-    folder: "NGC_891"
+    folder: "NGC_891",
+    shape: "edge-on-galaxy"
   }
 ];
 
@@ -95,6 +100,9 @@ class StarMapApp {
     // Create trip stars and initialize constellation lines
     const tripElements = this.interactionManager.createTripStars(tripsData);
     this.constellationManager.initialize(tripElements);
+
+    // Pass trip elements to black hole manager for interaction
+    this.blackHoleManager.setTripStars(tripElements);
 
     this.animate();
   }

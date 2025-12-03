@@ -6,9 +6,10 @@ export class BlackHoleManager {
     this.mass = 10;
     this.mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     this.particles = [];
-    
+    this.domParticles = []; // For DOM-based trip stars (moon, galaxy, etc.)
+
     this.boundMouseMove = this.handleMouseMove.bind(this);
-    
+
     // Setup UI
     this.toggleBtn = document.getElementById('black-hole-toggle');
     this.resetBtn = document.getElementById('black-hole-reset');
@@ -67,8 +68,9 @@ export class BlackHoleManager {
     
     this.canvas.removeEventListener('mousemove', this.boundMouseMove);
     this.particles = [];
+    this.domParticles = [];
     this.mass = 10;
-    
+
     // Ideally we should signal main app to reset stars, but for now reload is a safe fallback for this destructive mode
     window.location.reload();
   }
@@ -77,6 +79,11 @@ export class BlackHoleManager {
     const rect = this.canvas.getBoundingClientRect();
     this.mouse.x = e.clientX - rect.left;
     this.mouse.y = e.clientY - rect.top;
+  }
+
+  // Initialize DOM trip stars for black hole interaction
+  setTripStars(tripElements) {
+    this.tripElements = tripElements;
   }
 
   update(stars) {
@@ -96,7 +103,7 @@ export class BlackHoleManager {
       const dy = p.starRef.y - this.mouse.y;
       const dist = Math.sqrt(dx*dx + dy*dy);
       const angle = Math.atan2(dy, dx); // Angle FROM black hole TO star
-      
+
       // Gravity
       const force = (100 * this.mass) / (dist * dist + 1); // +1 to avoid div by zero
       const ax = -Math.cos(angle) * force;
@@ -124,6 +131,72 @@ export class BlackHoleManager {
       // Trail
       p.hist.push({x: p.starRef.x, y: p.starRef.y});
       if (p.hist.length > 5) p.hist.shift();
+    });
+
+    // Update DOM-based trip stars (moon, galaxy, etc.)
+    this.updateDomParticles();
+  }
+
+  updateDomParticles() {
+    if (!this.tripElements || this.tripElements.length === 0) return;
+
+    // Initialize DOM particles if needed
+    if (this.domParticles.length === 0) {
+      this.domParticles = this.tripElements.map(el => {
+        const rect = el.getBoundingClientRect();
+        return {
+          el: el,
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+          vx: 0,
+          vy: 0,
+          consumed: false
+        };
+      });
+    }
+
+    this.domParticles.forEach(p => {
+      if (p.consumed) return;
+
+      const dx = p.x - this.mouse.x;
+      const dy = p.y - this.mouse.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const angle = Math.atan2(dy, dx);
+
+      // Stronger gravity for DOM elements (they're bigger, more dramatic)
+      const force = (150 * this.mass) / (dist * dist + 1);
+      const ax = -Math.cos(angle) * force;
+      const ay = -Math.sin(angle) * force;
+
+      p.vx += ax;
+      p.vy += ay;
+      p.vx *= 0.92; // Slightly more friction
+      p.vy *= 0.92;
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Update DOM position
+      p.el.style.left = `${p.x}px`;
+      p.el.style.top = `${p.y}px`;
+      p.el.style.transform = 'translate(-50%, -50%)';
+
+      // Add rotation based on velocity for visual effect
+      const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      const rotation = speed * 2;
+      p.el.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+
+      // Scale down as it gets closer to event horizon
+      const scale = Math.max(0.1, Math.min(1, dist / 100));
+      p.el.style.transform = `translate(-50%, -50%) rotate(${rotation}deg) scale(${scale})`;
+
+      // Event horizon - consume the element
+      if (dist < this.mass * 1.5) {
+        p.consumed = true;
+        p.el.style.opacity = '0';
+        p.el.style.transform = 'translate(-50%, -50%) scale(0)';
+        this.mass += 2; // Bigger mass boost for consuming trip stars
+      }
     });
   }
 

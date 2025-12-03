@@ -127,13 +127,188 @@ body {
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
 }
 
+/* Hub Modal */
+.hub-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.hub-modal.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hub-modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.95) 100%);
+}
+
+.hub-modal-content {
+  position: relative;
+  text-align: center;
+  padding: 50px;
+  max-width: 400px;
+}
+
+.hub-modal-whisper {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+  font-style: italic;
+  animation: fadeInUp 0.8s ease 0.2s both;
+}
+
+.hub-modal-photo {
+  margin-bottom: 25px;
+  animation: fadeInUp 0.8s ease 0.4s both;
+}
+
+.photo-placeholder {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+}
+
+.photo-star {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.3);
+  animation: pulse-star 3s ease-in-out infinite;
+}
+
+@keyframes pulse-star {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+.hub-modal-title {
+  font-size: 18px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 3px;
+  margin-bottom: 35px;
+  text-transform: lowercase;
+  animation: fadeInUp 0.8s ease 0.6s both;
+}
+
+.hub-modal-paths {
+  animation: fadeInUp 0.8s ease 0.8s both;
+}
+
+.hub-modal-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  padding: 12px 25px;
+  transition: all 0.3s ease;
+}
+
+.hub-modal-link:hover {
+  color: white;
+}
+
+.hub-modal-link:hover .link-arrow {
+  transform: translateX(5px);
+  opacity: 1;
+}
+
+.hub-modal-link.secondary {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+}
+
+.hub-modal-link.secondary:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.link-arrow {
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.hub-modal-divider {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 15px 0;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.divider-text {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 2px;
+}
+
+.hub-modal-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 28px;
+  cursor: pointer;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+.hub-modal-close:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Trip Star Styling */
 .trip-star {
   position: absolute;
   transform: translate(-50%, -50%);
   cursor: pointer;
   pointer-events: auto;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease, opacity 0.5s ease;
+}
+
+/* Black hole interaction - smooth consumption */
+body.black-hole-cursor .trip-star {
+  transition: opacity 0.3s ease, transform 0.1s linear;
 }
 
 /* The star itself - small, bright dot */
@@ -186,6 +361,228 @@ body {
 .trip-star:nth-child(3)::before { animation-delay: 1.2s; }
 .trip-star:nth-child(4)::before { animation-delay: 1.8s; }
 .trip-star:nth-child(5)::before { animation-delay: 2.4s; }
+
+/* Spiral Galaxy Shape */
+.trip-star.shape-spiral-galaxy::before {
+  display: none; /* Hide default dot */
+}
+
+.trip-star.shape-spiral-galaxy::after {
+  display: none; /* Hide default ring */
+}
+
+.galaxy-sprite {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70px;
+  height: 70px;
+  transform: translate(-50%, -50%);
+  background: url('assets/FrontGlaxy2.png') center/contain no-repeat;
+  animation: galaxy-rotate 30s linear infinite;
+  opacity: 0.55;
+  filter: contrast(1.1) brightness(1.1);
+  transition: opacity 0.3s ease, width 0.3s ease, height 0.3s ease;
+}
+
+.trip-star.shape-spiral-galaxy:hover .galaxy-sprite {
+  opacity: 0.85;
+  width: 100px;
+  height: 100px;
+}
+
+@keyframes galaxy-rotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Crescent Moon Shape */
+.trip-star.shape-crescent-moon::before {
+  display: none;
+}
+
+.trip-star.shape-crescent-moon::after {
+  display: none;
+}
+
+.moon-shape {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at 30% 30%, #fffef0 0%, #e8e8e8 50%, #c0c0c0 100%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 8px rgba(255, 255, 240, 0.4),
+    0 0 15px rgba(255, 255, 240, 0.2);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease, filter 0.3s ease;
+}
+
+.moon-shadow {
+  position: absolute;
+  top: -4px;
+  right: -22px;
+  width: 22px;
+  height: 30px;
+  background: #000;
+  border-radius: 50%;
+  animation: moon-phase 60s linear infinite;
+}
+
+.trip-star.shape-crescent-moon:hover .moon-shape {
+  box-shadow:
+    0 0 12px rgba(255, 255, 240, 0.6),
+    0 0 25px rgba(255, 255, 240, 0.3);
+  filter: brightness(1.2);
+}
+
+@keyframes moon-phase {
+  0% {
+    right: -22px; /* Full moon */
+  }
+  50% {
+    right: 22px; /* New moon */
+  }
+  100% {
+    right: -22px; /* Full moon */
+  }
+}
+
+/* Sun Shape */
+.trip-star.shape-sun::before {
+  display: none;
+}
+
+.trip-star.shape-sun::after {
+  display: none;
+}
+
+.sun-sprite {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translate(-50%, -50%);
+  background: url('assets/Trips/Sun/Sun.JPG') center/cover no-repeat;
+  border-radius: 50%;
+  filter: brightness(1.4) saturate(1.2);
+  animation: sun-glow 4s ease-in-out infinite;
+  transition: filter 0.3s ease, width 0.3s ease, height 0.3s ease;
+}
+
+.trip-star.shape-sun:hover .sun-sprite {
+  width: 40px;
+  height: 40px;
+  filter: brightness(1.6) saturate(1.3);
+}
+
+@keyframes sun-glow {
+  0%, 100% {
+    filter: brightness(1.4) saturate(1.2);
+  }
+  50% {
+    filter: brightness(1.6) saturate(1.3);
+  }
+}
+
+/* Star Cluster Shape */
+.trip-star.shape-star-cluster::before {
+  display: none;
+}
+
+.trip-star.shape-star-cluster::after {
+  display: none;
+}
+
+.star-cluster-sprite {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Large clickable area */
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  cursor: pointer;
+}
+
+/* The actual stars rendered via pseudo-element */
+.star-cluster-sprite::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 50%;
+  box-shadow:
+    /* Core cluster */
+    4px 2px 0 0 white,
+    -3px 3px 0 0 white,
+    2px -4px 0 0 white,
+    -4px -2px 0 0 white,
+    0px 4px 0 0 white,
+    /* Middle spread */
+    6px 5px 0 0 rgba(255,255,255,0.85),
+    -5px 6px 0 0 rgba(255,255,255,0.85),
+    -6px -4px 0 0 rgba(255,255,255,0.8),
+    5px -6px 0 0 rgba(255,255,255,0.8),
+    7px 0px 0 0 rgba(255,255,255,0.75),
+    -7px 1px 0 0 rgba(255,255,255,0.75),
+    /* Outer stars */
+    9px 4px 0 0 rgba(255,255,255,0.6),
+    -8px -6px 0 0 rgba(255,255,255,0.55),
+    3px 9px 0 0 rgba(255,255,255,0.6),
+    -4px -9px 0 0 rgba(255,255,255,0.55),
+    10px -3px 0 0 rgba(255,255,255,0.5),
+    -10px 4px 0 0 rgba(255,255,255,0.5),
+    /* Far scattered */
+    12px 7px 0 0 rgba(255,255,255,0.4),
+    -11px -8px 0 0 rgba(255,255,255,0.35),
+    -7px 11px 0 0 rgba(255,255,255,0.4),
+    8px -10px 0 0 rgba(255,255,255,0.35);
+  opacity: 0.85;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.trip-star.shape-star-cluster:hover .star-cluster-sprite::before {
+  transform: translate(-50%, -50%) scale(1.6);
+  opacity: 1;
+}
+
+/* Edge-on Galaxy Shape (NGC 891) */
+.trip-star.shape-edge-on-galaxy::before {
+  display: none;
+}
+
+.trip-star.shape-edge-on-galaxy::after {
+  display: none;
+}
+
+.edge-on-galaxy-sprite {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 720px;
+  height: 360px;
+  transform: translate(-50%, -50%);
+  background: url('assets/Trips/NGC_891/NGC891.png') center/contain no-repeat;
+  opacity: 1;
+  filter: brightness(3) contrast(1.5);
+  transition: width 0.3s ease, height 0.3s ease, filter 0.3s ease;
+}
+
+.trip-star.shape-edge-on-galaxy:hover .edge-on-galaxy-sprite {
+  width: 1000px;
+  height: 500px;
+  filter: brightness(3.5) contrast(1.6);
+}
 
 /* Hover state - subtle ring appears */
 .trip-star:hover::before {

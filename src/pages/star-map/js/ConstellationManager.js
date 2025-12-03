@@ -2,6 +2,9 @@ export class ConstellationManager {
   constructor() {
     this.svg = document.getElementById('constellation-lines');
     this.hub = document.getElementById('central-hub');
+    this.modal = document.getElementById('hub-modal');
+    this.modalBackdrop = this.modal.querySelector('.hub-modal-backdrop');
+    this.closeBtn = document.getElementById('close-hub-modal');
     this.tripElements = [];
 
     // Constellation elements
@@ -11,10 +14,36 @@ export class ConstellationManager {
     // Hub position (percentage-based, will convert to pixels)
     this.hubPosition = { x: 50, y: 50 };
 
-    // Set up hub click
-    this.hub.addEventListener('click', () => {
-      window.open('https://instagram.com', '_blank');
+    // Set up hub click to show modal
+    this.hub.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.showModal();
     });
+
+    // Close modal when clicking backdrop
+    this.modalBackdrop.addEventListener('click', () => {
+      this.hideModal();
+    });
+
+    // Close button
+    this.closeBtn.addEventListener('click', () => {
+      this.hideModal();
+    });
+
+    // Close modal on ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.hideModal();
+      }
+    });
+  }
+
+  showModal() {
+    this.modal.classList.remove('hidden');
+  }
+
+  hideModal() {
+    this.modal.classList.add('hidden');
   }
 
   // Called after trip stars are created

@@ -44,6 +44,44 @@ export class InteractionManager {
       const rgb = this.hexToRgb(trip.color);
       star.style.setProperty('--star-color-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
 
+      // Add shape-specific class and content
+      if (trip.shape) {
+        star.classList.add(`shape-${trip.shape}`);
+
+        if (trip.shape === 'spiral-galaxy') {
+          const galaxyImg = document.createElement('div');
+          galaxyImg.className = 'galaxy-sprite';
+          star.appendChild(galaxyImg);
+        }
+
+        if (trip.shape === 'crescent-moon') {
+          const moonEl = document.createElement('div');
+          moonEl.className = 'moon-shape';
+          const moonShadow = document.createElement('div');
+          moonShadow.className = 'moon-shadow';
+          moonEl.appendChild(moonShadow);
+          star.appendChild(moonEl);
+        }
+
+        if (trip.shape === 'sun') {
+          const sunEl = document.createElement('div');
+          sunEl.className = 'sun-sprite';
+          star.appendChild(sunEl);
+        }
+
+        if (trip.shape === 'star-cluster') {
+          const clusterEl = document.createElement('div');
+          clusterEl.className = 'star-cluster-sprite';
+          star.appendChild(clusterEl);
+        }
+
+        if (trip.shape === 'edge-on-galaxy') {
+          const galaxyEl = document.createElement('div');
+          galaxyEl.className = 'edge-on-galaxy-sprite';
+          star.appendChild(galaxyEl);
+        }
+      }
+
       const title = document.createElement('div');
       title.className = 'trip-star-title';
       title.textContent = trip.title;

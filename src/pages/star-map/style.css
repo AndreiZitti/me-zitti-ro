@@ -569,19 +569,20 @@ body.black-hole-cursor .trip-star {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 720px;
-  height: 360px;
-  transform: translate(-50%, -50%);
-  background: url('assets/Trips/NGC_891/NGC891.png') center/contain no-repeat;
-  opacity: 1;
-  filter: brightness(3) contrast(1.5);
-  transition: width 0.3s ease, height 0.3s ease, filter 0.3s ease;
+  width: 60px;
+  height: 40px;
+  transform: translate(-50%, -50%) scale(1);
+  transform-origin: center center;
+  background: url('assets/Trips/NGC_891/NGC891_tight.png') center/contain no-repeat;
+  opacity: 0.85;
+  filter: brightness(2) contrast(1.2);
+  transition: transform 0.3s ease, filter 0.3s ease, opacity 0.3s ease;
 }
 
 .trip-star.shape-edge-on-galaxy:hover .edge-on-galaxy-sprite {
-  width: 1000px;
-  height: 500px;
-  filter: brightness(3.5) contrast(1.6);
+  transform: translate(-50%, -50%) scale(2.5);
+  opacity: 1;
+  filter: brightness(2.5) contrast(1.4);
 }
 
 /* Hover state - subtle ring appears */
@@ -623,14 +624,24 @@ body.black-hole-cursor .trip-star {
   font-weight: 300;
   letter-spacing: 1px;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, top 0.3s ease;
   pointer-events: none;
   text-shadow: 0 0 10px rgba(0,0,0,0.8);
   color: rgba(255, 255, 255, 0.9);
+  z-index: 10;
 }
 
 .trip-star:hover .trip-star-title {
   opacity: 1;
+}
+
+/* Move title down for edge-on galaxy when hovered to avoid overlap */
+.trip-star.shape-edge-on-galaxy .trip-star-title {
+  top: 35px;
+}
+
+.trip-star.shape-edge-on-galaxy:hover .trip-star-title {
+  top: 70px;
 }
 
 /* Detail View - Carousel */

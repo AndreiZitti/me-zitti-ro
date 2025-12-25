@@ -645,7 +645,8 @@ class TerminalAnimation {
       { cmd: 'coding', icon: '💻', desc: 'My Projects', url: 'https://projects.zitti.ro' },
       { cmd: 'library', icon: '📚', desc: 'Book Collection', url: 'pages/book-library/index.html' },
       { cmd: 'stars', icon: '⭐', desc: 'Star Map', url: 'pages/star-map/index.html' },
-      { cmd: 'games', icon: '🎲', desc: 'Party Games', url: 'https://games.zitti.ro' }
+      { cmd: 'games', icon: '🎲', desc: 'Party Games', url: 'https://games.zitti.ro' },
+      { cmd: 'travel', icon: '✈️', desc: 'Travel Map', url: 'https://travelling.zitti.ro' }
     ];
 
     commands.forEach((cmd, index) => {
@@ -727,7 +728,8 @@ class TerminalAnimation {
       'coding': 'https://projects.zitti.ro',
       'library': 'pages/book-library/index.html',
       'stars': 'pages/star-map/index.html',
-      'games': 'https://games.zitti.ro'
+      'games': 'https://games.zitti.ro',
+      'travel': 'https://travelling.zitti.ro'
     };
 
     if (commands[command]) {
@@ -750,7 +752,7 @@ class TerminalAnimation {
     errorLine.innerHTML = `<span class="red">Command not found: ${command}</span>`;
 
     const helpLine = this.createLine();
-    helpLine.innerHTML = `<span class="gray">Available commands: me, coding, library, stars, games, help</span>`;
+    helpLine.innerHTML = `<span class="gray">Available commands: me, coding, library, stars, games, travel, help</span>`;
 
     setTimeout(() => {
       this.enableInteractiveMode();
@@ -849,6 +851,7 @@ Hint: You can type 'me', 'coding', 'library', or 'stars'</span>`;
   library  - Book Collection
   stars    - Star Map
   games    - Party Games
+  travel   - Travel Map
 
 <span class="green">System:</span>
   ls       - List files

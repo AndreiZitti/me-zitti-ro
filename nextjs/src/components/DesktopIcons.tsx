@@ -24,7 +24,7 @@ const icons: DesktopIconData[] = [
     id: 'now',
     label: 'Now',
     hint: "What I'm currently up to",
-    internal: '/pages/now/index.html',
+    internal: '/now',
     x: '82%',
     y: '18%',
     icon: (
@@ -150,7 +150,7 @@ export default function DesktopIcons({ onOpenModal, onOpenProfile }: DesktopIcon
 
   useEffect(() => {
     const today = new Date().toDateString();
-    const lastBoot = localStorage.getItem('zittios-last-boot');
+    const lastBoot = localStorage.getItem('zittihub-last-boot');
     setIsBooted(lastBoot === today);
   }, []);
 

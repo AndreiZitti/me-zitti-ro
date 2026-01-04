@@ -17,7 +17,7 @@ export default function Home() {
 
   useEffect(() => {
     const today = new Date().toDateString();
-    const lastBoot = localStorage.getItem('zittios-last-boot');
+    const lastBoot = localStorage.getItem('zittihub-last-boot');
     setIsBooted(lastBoot === today);
 
     // Respect reduced motion

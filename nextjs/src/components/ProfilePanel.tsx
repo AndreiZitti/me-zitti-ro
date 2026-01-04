@@ -17,7 +17,7 @@ export default function ProfilePanel({ isOpen, onClose }: ProfilePanelProps) {
 
   useEffect(() => {
     // Load saved background preference
-    const saved = localStorage.getItem('zittios-background') || 'starfield';
+    const saved = localStorage.getItem('zittihub-background') || 'starfield';
     setSelectedBackground(saved);
     applyBackground(saved);
   }, []);
@@ -55,7 +55,7 @@ export default function ProfilePanel({ isOpen, onClose }: ProfilePanelProps) {
   const handleBackgroundChange = (bg: string) => {
     setSelectedBackground(bg);
     applyBackground(bg);
-    localStorage.setItem('zittios-background', bg);
+    localStorage.setItem('zittihub-background', bg);
   };
 
   const handleSignIn = () => {

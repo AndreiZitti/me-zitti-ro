@@ -6,14 +6,15 @@ export default function BootAnimation() {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    // Check if we should skip the boot animation (visited today)
-    const today = new Date().toDateString();
-    const lastBoot = localStorage.getItem('zittios-last-boot');
+    // Check if we should skip the boot animation (visited this hour)
+    const now = new Date();
+    const currentHour = `${now.toDateString()}-${now.getHours()}`;
+    const lastBoot = localStorage.getItem('zittihub-last-boot');
 
-    if (lastBoot === today) {
+    if (lastBoot === currentHour) {
       setIsVisible(false);
     } else {
-      localStorage.setItem('zittios-last-boot', today);
+      localStorage.setItem('zittihub-last-boot', currentHour);
       // Hide after animation completes
       const timer = setTimeout(() => {
         setIsVisible(false);

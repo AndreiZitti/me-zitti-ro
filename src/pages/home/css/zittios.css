@@ -102,12 +102,13 @@ body {
 
 .dock {
     position: fixed;
-    bottom: 24px;
+    bottom: 16px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 8px;
-    padding: 12px 16px;
+    align-items: flex-end;
+    gap: 4px;
+    padding: 8px 12px;
     background: var(--bg-surface);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -116,27 +117,34 @@ body {
     box-shadow: var(--shadow-soft);
 }
 
+.dock-divider {
+    width: 1px;
+    height: 32px;
+    background: var(--border-subtle);
+    margin: 0 4px;
+    align-self: center;
+}
+
 .dock-item {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 6px;
-    padding: 12px;
+    justify-content: center;
+    padding: 8px;
     background: transparent;
     border: none;
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all var(--transition-normal);
+    transition: transform 0.15s ease-out;
     position: relative;
+    transform-origin: bottom center;
 }
 
 .dock-item:hover {
-    background: rgba(99, 102, 241, 0.1);
-    transform: translateY(-4px);
+    background: transparent;
 }
 
 .dock-item:active {
-    transform: translateY(-2px) scale(0.98);
+    transform: scale(0.95);
 }
 
 .dock-icon {
@@ -156,30 +164,60 @@ body {
 .dock-icon svg {
     width: 24px;
     height: 24px;
+    transition: transform 0.15s ease-out;
 }
 
-.dock-label {
+/* Tooltip */
+.dock-item::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    padding: 6px 12px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
     font-size: 0.75rem;
     font-weight: 500;
-    color: var(--text-muted);
-    transition: color var(--transition-fast);
+    color: var(--text-primary);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+    pointer-events: none;
+    z-index: 10;
 }
 
-.dock-item:hover .dock-label {
-    color: var(--text-secondary);
+.dock-item:hover::before {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
 }
 
 /* Dock item indicator dot (for active state) */
 .dock-item.active::after {
     content: '';
     position: absolute;
-    bottom: 4px;
+    bottom: 2px;
     left: 50%;
     transform: translateX(-50%);
     width: 4px;
     height: 4px;
     background: var(--accent-primary);
     border-radius: 50%;
+}
+
+/* Bounce animation */
+@keyframes dockBounce {
+    0%, 100% { transform: translateY(0); }
+    25% { transform: translateY(-12px); }
+    50% { transform: translateY(-6px); }
+    75% { transform: translateY(-10px); }
+}
+
+.dock-item.bouncing {
+    animation: dockBounce 0.5s ease-in-out;
 }
 
 /* ========================================

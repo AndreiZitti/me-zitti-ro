@@ -32,34 +32,31 @@
         </header>
 
         <!-- Dock -->
-        <nav class="dock">
-            <button class="dock-item" data-app="projects" data-external="https://projects.zitti.ro">
+        <nav class="dock" id="dock">
+            <button class="dock-item" data-app="projects" data-external="https://projects.zitti.ro" data-tooltip="Projects">
                 <div class="dock-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <polyline points="4 17 10 11 4 5"></polyline>
                         <line x1="12" y1="19" x2="20" y2="19"></line>
                     </svg>
                 </div>
-                <span class="dock-label">Projects</span>
             </button>
-            <button class="dock-item" data-app="stars" data-internal="pages/star-map/index.html">
+            <button class="dock-item" data-app="stars" data-internal="pages/star-map/index.html" data-tooltip="Stars">
                 <div class="dock-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                     </svg>
                 </div>
-                <span class="dock-label">Stars</span>
             </button>
-            <button class="dock-item" data-app="library" data-internal="pages/book-library/index.html">
+            <button class="dock-item" data-app="library" data-internal="pages/book-library/index.html" data-tooltip="Library">
                 <div class="dock-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                         <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                     </svg>
                 </div>
-                <span class="dock-label">Library</span>
             </button>
-            <button class="dock-item" data-app="games" data-external="https://games.zitti.ro">
+            <button class="dock-item" data-app="games" data-external="https://games.zitti.ro" data-tooltip="Games">
                 <div class="dock-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <rect x="2" y="4" width="20" height="16" rx="2"></rect>
@@ -68,9 +65,8 @@
                         <circle cx="16" cy="14" r="1"></circle>
                     </svg>
                 </div>
-                <span class="dock-label">Games</span>
             </button>
-            <button class="dock-item" data-app="travel" data-external="https://travelling.zitti.ro">
+            <button class="dock-item" data-app="travel" data-external="https://travelling.zitti.ro" data-tooltip="Travel">
                 <div class="dock-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <circle cx="12" cy="12" r="10"></circle>
@@ -78,7 +74,15 @@
                         <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
                     </svg>
                 </div>
-                <span class="dock-label">Travel</span>
+            </button>
+            <div class="dock-divider"></div>
+            <button class="dock-item" data-app="settings" data-tooltip="Settings">
+                <div class="dock-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </div>
             </button>
         </nav>
     </div>

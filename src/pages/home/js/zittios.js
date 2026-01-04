@@ -208,6 +208,71 @@ class DockController {
 }
 
 // ========================================
+// Menu Bar
+// ========================================
+
+class MenuBar {
+    constructor() {
+        this.menuItem = document.getElementById('menu-zittios');
+        if (!this.menuItem) return;
+
+        this.isOpen = false;
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        // Toggle on click
+        this.menuItem.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggle();
+        });
+
+        // Handle dropdown item clicks
+        this.menuItem.querySelectorAll('.menu-dropdown-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const action = item.dataset.action;
+                this.handleAction(action);
+                this.close();
+            });
+        });
+
+        // Close on outside click
+        document.addEventListener('click', () => this.close());
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') this.close();
+        });
+    }
+
+    toggle() {
+        this.isOpen = !this.isOpen;
+        this.menuItem.classList.toggle('active', this.isOpen);
+    }
+
+    close() {
+        this.isOpen = false;
+        this.menuItem.classList.remove('active');
+    }
+
+    handleAction(action) {
+        switch (action) {
+            case 'about':
+                this.showAbout();
+                break;
+            case 'settings':
+                window.dispatchEvent(new CustomEvent('openSettings'));
+                break;
+        }
+    }
+
+    showAbout() {
+        alert('ZittiOS v2.0\n\nA desktop-style personal website.\n\nBuilt with vanilla JS, CSS, and love.');
+    }
+}
+
+// ========================================
 // Initialization
 // ========================================
 
@@ -219,6 +284,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize clock
     new Clock('clock');
+
+    // Initialize menu bar
+    new MenuBar();
 
     // Initialize modal and dock
     const modalManager = new ModalManager();

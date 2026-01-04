@@ -24,7 +24,18 @@
         <!-- Top Bar -->
         <header class="top-bar">
             <div class="top-bar-left">
-                <span class="logo">ANDREI ZITTI</span>
+                <div class="menu-item" id="menu-zittios">
+                    <span class="menu-logo">✦</span>
+                    <span class="menu-title">ZittiOS</span>
+                    <svg class="menu-arrow" viewBox="0 0 12 12" fill="currentColor">
+                        <path d="M3 5l3 3 3-3"/>
+                    </svg>
+                    <div class="menu-dropdown">
+                        <button class="menu-dropdown-item" data-action="about">About ZittiOS</button>
+                        <div class="menu-dropdown-divider"></div>
+                        <button class="menu-dropdown-item" data-action="settings">Settings...</button>
+                    </div>
+                </div>
             </div>
             <div class="top-bar-right">
                 <span class="clock" id="clock"></span>

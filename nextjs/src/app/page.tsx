@@ -53,7 +53,7 @@ export default function Home() {
         }}
       >
         {/* Top Bar */}
-        <TopBar onOpenSettings={() => setProfileOpen(true)} />
+        <TopBar />
 
         {/* Welcome Panel */}
         <WelcomePanel />

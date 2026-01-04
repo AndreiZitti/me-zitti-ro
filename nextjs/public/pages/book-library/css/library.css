@@ -1,0 +1,404 @@
+/* Personal Book Library - Three.js 3D Showcase Styles */
+
+/* Page Flip Overlay */
+#page-flip-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-flip-container {
+  position: relative;
+  width: 80vw;
+  height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#page-flip-book {
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* StPageFlip creates a canvas - make sure it's visible */
+#page-flip-book canvas {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.page-flip-container .close-btn {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: white;
+  border: none;
+  font-size: 30px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+/* Page styles for StPageFlip */
+.page {
+  background: white;
+  color: #000;
+  border: 1px solid #ccc;
+}
+
+.page-content {
+  width: 100%;
+  height: 100%;
+  padding: 40px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-cover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.page-cover-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.page-cover-content h1 {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.page-cover-content h2 {
+  font-size: 24px;
+  font-style: italic;
+}
+
+.page-cover-content .genre-tag {
+  margin-top: 20px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.page-back-cover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.page-back-cover .quote {
+  font-size: 20px;
+  font-style: italic;
+  margin-bottom: 30px;
+  line-height: 1.8;
+}
+
+.page-back-cover .rating {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.page-header {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.page-text {
+  flex: 1;
+}
+
+.page-text h3 {
+  margin-top: 0;
+}
+
+.page-text p {
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.page-footer {
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+}
+
+/* Reset body and html for scrollable fullscreen */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto; /* Allow vertical scrolling */
+}
+
+/* Scroll spacer - invisible element that enables scrolling */
+#scroll-spacer {
+  height: 300vh; /* 3x viewport height to allow scrolling through shelves */
+  width: 1px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Fullscreen Three.js Canvas Container */
+#bookshelf-3d-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+#bookshelf-3d-container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Header Overlay */
+.header-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 15px 30px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-overlay h1 {
+  margin: 0;
+  color: white;
+  font-size: 24px;
+  font-weight: 300;
+}
+
+.main-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-link {
+  display: inline-block;
+  padding: 8px 16px;
+  background: rgba(252, 117, 111, 0.9);
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.admin-link:hover {
+  background: rgba(208, 84, 78, 1);
+  text-decoration: none;
+}
+
+/* Filter Controls Overlay */
+.filter-controls-overlay {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  padding: 15px;
+  border-radius: 8px;
+  z-index: 100;
+  color: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  max-width: 300px;
+}
+
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.filter-section label {
+  font-weight: bold;
+  color: #fc756f;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.filter-section select {
+  padding: 6px 10px;
+  border: 1px solid rgba(252, 117, 111, 0.5);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.filter-section select option {
+  background: #1a1a1a;
+  color: white;
+}
+
+.filter-section button {
+  padding: 6px 12px;
+  background: rgba(252, 117, 111, 0.9);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 12px;
+  transition: background 0.3s ease;
+}
+
+.filter-section button:hover {
+  background: rgba(208, 84, 78, 1);
+}
+
+.sort-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sort-btn {
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 12px;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.sort-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sort-btn.active {
+  background: rgba(252, 117, 111, 0.9);
+  border-color: rgba(252, 117, 111, 1);
+  color: white;
+}
+
+/* Book Details Overlay */
+.book-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(10px);
+  border: 2px solid #fc756f;
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  z-index: 1000;
+  color: white;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.book-details-content {
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #fc756f;
+  border: none;
+  color: white;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+.close-btn:hover {
+  background: #d0544e;
+}
+
+.book-details-content h2 {
+  margin: 0 0 10px 0;
+  color: #fc756f;
+  font-size: 24px;
+}
+
+.book-details-content p {
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+.book-details-content blockquote {
+  margin: 15px 0;
+  padding: 15px;
+  background: rgba(252, 117, 111, 0.1);
+  border-left: 4px solid #fc756f;
+  font-style: italic;
+}
+
+/* Hide old containers */
+#dynamic-shelves-container {
+  display: none !important;
+}
+
+/* Responsive design */
+@media screen and (max-width: 768px) {
+  .header-overlay {
+    padding: 10px 15px;
+  }
+
+  .header-overlay h1 {
+    font-size: 18px;
+  }
+
+  .filter-controls-overlay {
+    top: 60px;
+    right: 10px;
+    max-width: 250px;
+    padding: 12px;
+  }
+
+  .admin-link {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}

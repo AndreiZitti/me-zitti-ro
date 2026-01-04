@@ -1,0 +1,1004 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000000;
+  font-family: 'Arial', sans-serif;
+  color: white;
+  opacity: 0;
+  animation: fadeIn 1s ease-in forwards;
+  animation-delay: 0.5s;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+#starfield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  will-change: contents;
+}
+
+#nebulae-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+#nebulae-container.transitioning .trip-star {
+  pointer-events: none !important;
+}
+
+/* Constellation Lines Layer */
+.constellation-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.constellation-layer path {
+  stroke: rgba(255, 255, 255, 0.2);
+  stroke-width: 1;
+  fill: none;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.15));
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  transition: stroke-dashoffset 1.2s ease-in;
+}
+
+.constellation-layer path.visible {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 2.4s ease-out;
+}
+
+/* Temporary constellation point */
+.constellation-layer .temp-point {
+  fill: rgba(255, 255, 255, 0.4);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
+}
+
+.constellation-layer .temp-point.visible {
+  opacity: 1;
+}
+
+/* Central Hub */
+.central-hub {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  z-index: 3;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.3s ease;
+}
+
+.central-hub:hover,
+.central-hub.revealed {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.hub-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.3) 30%, transparent 60%);
+  border-radius: 50%;
+}
+
+.hub-glow::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
+}
+
+/* Hub Modal */
+.hub-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.hub-modal.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hub-modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.95) 100%);
+}
+
+.hub-modal-content {
+  position: relative;
+  text-align: center;
+  padding: 50px;
+  max-width: 400px;
+}
+
+.hub-modal-whisper {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+  font-style: italic;
+  animation: fadeInUp 0.8s ease 0.2s both;
+}
+
+.hub-modal-photo {
+  margin-bottom: 25px;
+  animation: fadeInUp 0.8s ease 0.4s both;
+}
+
+.photo-placeholder {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+}
+
+.photo-star {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.3);
+  animation: pulse-star 3s ease-in-out infinite;
+}
+
+@keyframes pulse-star {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+.hub-modal-title {
+  font-size: 18px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 3px;
+  margin-bottom: 35px;
+  text-transform: lowercase;
+  animation: fadeInUp 0.8s ease 0.6s both;
+}
+
+.hub-modal-paths {
+  animation: fadeInUp 0.8s ease 0.8s both;
+}
+
+.hub-modal-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  padding: 12px 25px;
+  transition: all 0.3s ease;
+}
+
+.hub-modal-link:hover {
+  color: white;
+}
+
+.hub-modal-link:hover .link-arrow {
+  transform: translateX(5px);
+  opacity: 1;
+}
+
+.hub-modal-link.secondary {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+}
+
+.hub-modal-link.secondary:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.link-arrow {
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.hub-modal-divider {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 15px 0;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.divider-text {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 2px;
+}
+
+.hub-modal-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 28px;
+  cursor: pointer;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+.hub-modal-close:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Trip Star Styling */
+.trip-star {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: all 0.3s ease, opacity 0.5s ease;
+}
+
+/* Black hole interaction - smooth consumption */
+body.black-hole-cursor .trip-star {
+  transition: opacity 0.3s ease, transform 0.1s linear;
+}
+
+/* The star itself - small, bright dot */
+.trip-star::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: white;
+  box-shadow:
+    0 0 10px var(--star-color),
+    0 0 20px var(--star-color),
+    0 0 30px rgba(var(--star-color-rgb), 0.4);
+  animation: star-pulse 3s ease-in-out infinite;
+}
+
+/* Size variations */
+.trip-star.large::before {
+  width: 10px;
+  height: 10px;
+}
+
+.trip-star.medium::before {
+  width: 8px;
+  height: 8px;
+}
+
+.trip-star.small::before {
+  width: 6px;
+  height: 6px;
+}
+
+/* Subtle pulsing animation */
+@keyframes star-pulse {
+  0%, 100% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+}
+
+/* Stagger the animations */
+.trip-star:nth-child(1)::before { animation-delay: 0s; }
+.trip-star:nth-child(2)::before { animation-delay: 0.6s; }
+.trip-star:nth-child(3)::before { animation-delay: 1.2s; }
+.trip-star:nth-child(4)::before { animation-delay: 1.8s; }
+.trip-star:nth-child(5)::before { animation-delay: 2.4s; }
+
+/* Spiral Galaxy Shape */
+.trip-star.shape-spiral-galaxy::before {
+  display: none; /* Hide default dot */
+}
+
+.trip-star.shape-spiral-galaxy::after {
+  display: none; /* Hide default ring */
+}
+
+.galaxy-sprite {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70px;
+  height: 70px;
+  transform: translate(-50%, -50%);
+  background: url('assets/FrontGlaxy2.png') center/contain no-repeat;
+  animation: galaxy-rotate 30s linear infinite;
+  opacity: 0.55;
+  filter: contrast(1.1) brightness(1.1);
+  transition: opacity 0.3s ease, width 0.3s ease, height 0.3s ease;
+}
+
+.trip-star.shape-spiral-galaxy:hover .galaxy-sprite {
+  opacity: 0.85;
+  width: 100px;
+  height: 100px;
+}
+
+@keyframes galaxy-rotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Crescent Moon Shape */
+.trip-star.shape-crescent-moon::before {
+  display: none;
+}
+
+.trip-star.shape-crescent-moon::after {
+  display: none;
+}
+
+.moon-shape {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at 30% 30%, #fffef0 0%, #e8e8e8 50%, #c0c0c0 100%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 8px rgba(255, 255, 240, 0.4),
+    0 0 15px rgba(255, 255, 240, 0.2);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease, filter 0.3s ease;
+}
+
+.moon-shadow {
+  position: absolute;
+  top: -4px;
+  right: -22px;
+  width: 22px;
+  height: 30px;
+  background: #000;
+  border-radius: 50%;
+  animation: moon-phase 60s linear infinite;
+}
+
+.trip-star.shape-crescent-moon:hover .moon-shape {
+  box-shadow:
+    0 0 12px rgba(255, 255, 240, 0.6),
+    0 0 25px rgba(255, 255, 240, 0.3);
+  filter: brightness(1.2);
+}
+
+@keyframes moon-phase {
+  0% {
+    right: -22px; /* Full moon */
+  }
+  50% {
+    right: 22px; /* New moon */
+  }
+  100% {
+    right: -22px; /* Full moon */
+  }
+}
+
+/* Sun Shape */
+.trip-star.shape-sun::before {
+  display: none;
+}
+
+.trip-star.shape-sun::after {
+  display: none;
+}
+
+.sun-sprite {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translate(-50%, -50%);
+  background: url('assets/Trips/Sun/Sun.JPG') center/cover no-repeat;
+  border-radius: 50%;
+  filter: brightness(1.4) saturate(1.2);
+  animation: sun-glow 4s ease-in-out infinite;
+  transition: filter 0.3s ease, width 0.3s ease, height 0.3s ease;
+}
+
+.trip-star.shape-sun:hover .sun-sprite {
+  width: 40px;
+  height: 40px;
+  filter: brightness(1.6) saturate(1.3);
+}
+
+@keyframes sun-glow {
+  0%, 100% {
+    filter: brightness(1.4) saturate(1.2);
+  }
+  50% {
+    filter: brightness(1.6) saturate(1.3);
+  }
+}
+
+/* Star Cluster Shape */
+.trip-star.shape-star-cluster::before {
+  display: none;
+}
+
+.trip-star.shape-star-cluster::after {
+  display: none;
+}
+
+.star-cluster-sprite {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Large clickable area */
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  cursor: pointer;
+}
+
+/* The actual stars rendered via pseudo-element */
+.star-cluster-sprite::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 50%;
+  box-shadow:
+    /* Core cluster */
+    4px 2px 0 0 white,
+    -3px 3px 0 0 white,
+    2px -4px 0 0 white,
+    -4px -2px 0 0 white,
+    0px 4px 0 0 white,
+    /* Middle spread */
+    6px 5px 0 0 rgba(255,255,255,0.85),
+    -5px 6px 0 0 rgba(255,255,255,0.85),
+    -6px -4px 0 0 rgba(255,255,255,0.8),
+    5px -6px 0 0 rgba(255,255,255,0.8),
+    7px 0px 0 0 rgba(255,255,255,0.75),
+    -7px 1px 0 0 rgba(255,255,255,0.75),
+    /* Outer stars */
+    9px 4px 0 0 rgba(255,255,255,0.6),
+    -8px -6px 0 0 rgba(255,255,255,0.55),
+    3px 9px 0 0 rgba(255,255,255,0.6),
+    -4px -9px 0 0 rgba(255,255,255,0.55),
+    10px -3px 0 0 rgba(255,255,255,0.5),
+    -10px 4px 0 0 rgba(255,255,255,0.5),
+    /* Far scattered */
+    12px 7px 0 0 rgba(255,255,255,0.4),
+    -11px -8px 0 0 rgba(255,255,255,0.35),
+    -7px 11px 0 0 rgba(255,255,255,0.4),
+    8px -10px 0 0 rgba(255,255,255,0.35);
+  opacity: 0.85;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.trip-star.shape-star-cluster:hover .star-cluster-sprite::before {
+  transform: translate(-50%, -50%) scale(1.6);
+  opacity: 1;
+}
+
+/* Edge-on Galaxy Shape (NGC 891) */
+.trip-star.shape-edge-on-galaxy::before {
+  display: none;
+}
+
+.trip-star.shape-edge-on-galaxy::after {
+  display: none;
+}
+
+.edge-on-galaxy-sprite {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 40px;
+  transform: translate(-50%, -50%) scale(1);
+  transform-origin: center center;
+  background: url('assets/Trips/NGC_891/NGC891_tight.png') center/contain no-repeat;
+  opacity: 0.85;
+  filter: brightness(2) contrast(1.2);
+  transition: transform 0.3s ease, filter 0.3s ease, opacity 0.3s ease;
+}
+
+.trip-star.shape-edge-on-galaxy:hover .edge-on-galaxy-sprite {
+  transform: translate(-50%, -50%) scale(2.5);
+  opacity: 1;
+  filter: brightness(2.5) contrast(1.4);
+}
+
+/* Hover state - subtle ring appears */
+.trip-star:hover::before {
+  box-shadow:
+    0 0 15px var(--star-color),
+    0 0 30px var(--star-color),
+    0 0 45px rgba(var(--star-color-rgb), 0.6);
+}
+
+.trip-star::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--star-color);
+  opacity: 0;
+  transition: all 0.4s ease;
+}
+
+.trip-star:hover::after {
+  width: 50px;
+  height: 50px;
+  opacity: 0.4;
+}
+
+/* Title on hover */
+.trip-star-title {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  opacity: 0;
+  transition: opacity 0.3s ease, top 0.3s ease;
+  pointer-events: none;
+  text-shadow: 0 0 10px rgba(0,0,0,0.8);
+  color: rgba(255, 255, 255, 0.9);
+  z-index: 10;
+}
+
+.trip-star:hover .trip-star-title {
+  opacity: 1;
+}
+
+/* Move title down for edge-on galaxy when hovered to avoid overlap */
+.trip-star.shape-edge-on-galaxy .trip-star-title {
+  top: 35px;
+}
+
+.trip-star.shape-edge-on-galaxy:hover .trip-star-title {
+  top: 70px;
+}
+
+/* Detail View - Carousel */
+#trip-detail-view {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 100;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+  overflow: hidden;
+}
+
+#trip-detail-view.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.carousel-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  height: 85vh;
+  max-width: 1200px;
+  background: rgba(10, 10, 20, 0.95);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.carousel-container .slide .item {
+  width: 120px;
+  height: 180px;
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
+  border-radius: 12px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+  background-position: 50% 50%;
+  background-size: cover;
+  display: inline-block;
+  transition: 0.5s;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.carousel-container .slide .item:hover {
+  opacity: 1;
+}
+
+.slide .item:nth-child(1),
+.slide .item:nth-child(2) {
+  top: 0;
+  left: 0;
+  transform: translate(0, 0);
+  border-radius: 0;
+  width: 100%;
+  height: 100%;
+  cursor: default;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* Fade effect when changing images */
+.slide.fading .item:nth-child(2) {
+  opacity: 0;
+}
+
+.slide .item:nth-child(3) {
+  left: calc(100% - 400px);
+  top: auto;
+  bottom: 30px;
+  transform: none;
+}
+
+.slide .item:nth-child(4) {
+  left: calc(100% - 265px);
+  top: auto;
+  bottom: 30px;
+  transform: none;
+}
+
+.slide .item:nth-child(5) {
+  left: calc(100% - 130px);
+  top: auto;
+  bottom: 30px;
+  transform: none;
+  opacity: 0.4;
+}
+
+.slide .item:nth-child(n + 6) {
+  left: calc(100% - 130px);
+  top: auto;
+  bottom: 30px;
+  transform: none;
+  opacity: 0;
+}
+
+/* Carousel Content Overlay */
+.carousel-content {
+  position: absolute;
+  top: 50%;
+  left: 60px;
+  width: 40%;
+  max-width: 400px;
+  text-align: left;
+  color: #eee;
+  transform: translate(0, -50%);
+  font-family: system-ui, -apple-system, sans-serif;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.carousel-content .name {
+  font-size: 48px;
+  text-transform: uppercase;
+  font-weight: bold;
+  opacity: 0;
+  animation: carouselAnimate 1s ease-in-out forwards;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+}
+
+.carousel-content .des {
+  margin-top: 15px;
+  font-size: 16px;
+  line-height: 1.6;
+  opacity: 0;
+  animation: carouselAnimate 1s ease-in-out 0.3s forwards;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.carousel-content .meta {
+  margin-top: 20px;
+  font-size: 14px;
+  opacity: 0;
+  animation: carouselAnimate 1s ease-in-out 0.5s forwards;
+  color: rgba(255, 255, 255, 0.6);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+@keyframes carouselAnimate {
+  from {
+    opacity: 0;
+    transform: translate(0, 50px);
+    filter: blur(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0);
+    filter: blur(0);
+  }
+}
+
+/* Carousel Navigation */
+.carousel-buttons {
+  position: absolute;
+  bottom: 220px;
+  right: 30px;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+}
+
+.carousel-buttons button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+  backdrop-filter: blur(10px);
+}
+
+.carousel-buttons button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Close Button */
+.close-detail-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(30, 30, 50, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.close-detail-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+  background: rgba(50, 50, 80, 0.9);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+/* Black Hole Mode Button */
+.black-hole-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  z-index: 99;
+  transition: all 0.3s ease, opacity 0.3s ease;
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.black-hole-btn canvas {
+  display: block;
+  width: 60px;
+  height: 60px;
+}
+
+.black-hole-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Reset Button */
+.black-hole-reset-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(20, 20, 40, 0.8);
+  border: 2px solid rgba(100, 50, 200, 0.5);
+  color: white;
+  font-size: 32px;
+  cursor: pointer;
+  z-index: 99;
+  transition: all 0.3s ease, opacity 0.3s ease;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.black-hole-reset-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.black-hole-reset-btn:hover {
+  transform: scale(1.1);
+  background: rgba(50, 30, 80, 0.9);
+  border-color: rgba(100, 50, 200, 0.8);
+  box-shadow: 0 0 20px rgba(100, 50, 200, 0.6);
+}
+
+/* Black hole cursor mode */
+body.black-hole-cursor {
+  cursor: none;
+}
+
+.black-hole-btn:hover {
+  transform: scale(1.1);
+  background: rgba(50, 30, 80, 0.9);
+  border-color: rgba(100, 50, 200, 0.8);
+  box-shadow: 0 0 20px rgba(100, 50, 200, 0.6);
+}
+
+.black-hole-btn.active {
+  background: rgba(100, 50, 200, 0.9);
+  border-color: rgba(150, 100, 255, 1);
+  box-shadow: 0 0 30px rgba(100, 50, 200, 0.8);
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(100, 50, 200, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(100, 50, 200, 0.6);
+  }
+}
+
+/* Satellite Animation */
+.satellite {
+  position: fixed;
+  width: 20px;
+  height: auto;
+  z-index: 3;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .trip-star.large::before { width: 8px; height: 8px; }
+  .trip-star.medium::before { width: 6px; height: 6px; }
+  .trip-star.small::before { width: 5px; height: 5px; }
+
+  .carousel-container {
+    width: 95vw;
+    height: 90vh;
+  }
+
+  .carousel-content {
+    left: 30px;
+    width: 60%;
+  }
+
+  .carousel-content .name {
+    font-size: 28px;
+  }
+
+  .carousel-content .des {
+    font-size: 14px;
+  }
+
+  .carousel-buttons {
+    right: 20px;
+    bottom: 210px;
+  }
+
+  .slide .item:nth-child(3) {
+    left: calc(100% - 140px);
+    bottom: 15px;
+  }
+
+  .slide .item:nth-child(4),
+  .slide .item:nth-child(5),
+  .slide .item:nth-child(n + 6) {
+    opacity: 0;
+  }
+
+  .close-detail-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+}
+

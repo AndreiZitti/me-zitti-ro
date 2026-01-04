@@ -1,23 +1,12 @@
 {
   "name": "azitti-portfolio",
   "version": "1.0.0",
-  "description": "Interactive particle-to-object animation portfolio website",
-  "main": "src/index.html",
+  "description": "ZittiHub - Personal portfolio website",
   "scripts": {
-    "dev": "live-server src --port=3000 --open",
-    "start": "npm run dev",
-    "build": "npm run build:css && npm run build:js && npm run build:assets",
-    "build:css": "postcss 'src/pages/**/css/*.css' --base src --dir dist --use autoprefixer cssnano --config config/postcss.config.js",
-    "build:js": "terser src/pages/home/js/*.js --compress --mangle --output dist/js/bundle.min.js",
-    "build:assets": "cpx 'src/**/*' dist/",
-    "preview": "live-server dist --port=3001 --open",
-    "lint": "eslint 'src/**/*.js' --config config/.eslintrc.js",
-    "lint:fix": "eslint 'src/**/*.js' --fix --config config/.eslintrc.js",
-    "format": "prettier --write 'src/**/*.{html,css,js}' --config config/.prettierrc",
-    "clean": "rimraf dist",
-    "serve": "http-server src -p 3000 -o",
-    "test": "echo \"No tests specified\" && exit 0",
-    "validate": "npm run lint && npm run format --check"
+    "dev": "cd nextjs && npm run dev",
+    "start": "cd nextjs && npm run start",
+    "build": "cd nextjs && npm run build",
+    "lint": "cd nextjs && npm run lint"
   },
   "keywords": [
     "portfolio",

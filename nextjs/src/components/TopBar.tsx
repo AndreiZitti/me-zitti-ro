@@ -2,11 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-interface TopBarProps {
-  onOpenSettings?: () => void;
-}
-
-export default function TopBar({ onOpenSettings }: TopBarProps) {
+export default function TopBar() {
   const [time, setTime] = useState('');
 
   // Update clock

@@ -112,6 +112,59 @@ class ModalManager {
 }
 
 // ========================================
+// Dock Magnifier
+// ========================================
+
+class DockMagnifier {
+    constructor() {
+        this.dock = document.getElementById('dock');
+        if (!this.dock) return;
+
+        this.items = Array.from(this.dock.querySelectorAll('.dock-item'));
+        this.maxScale = 1.5;
+        this.effectRadius = 80;
+        this.isActive = true;
+
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        this.dock.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+        this.dock.addEventListener('mouseleave', () => this.resetScales());
+
+        // Disable magnification on mobile
+        if ('ontouchstart' in window) {
+            this.isActive = false;
+        }
+    }
+
+    handleMouseMove(e) {
+        if (!this.isActive) return;
+
+        const mouseX = e.clientX;
+
+        this.items.forEach(item => {
+            const itemRect = item.getBoundingClientRect();
+            const itemCenterX = itemRect.left + itemRect.width / 2;
+            const distance = Math.abs(mouseX - itemCenterX);
+
+            let scale = 1;
+            if (distance < this.effectRadius) {
+                scale = 1 + (this.maxScale - 1) * (1 - distance / this.effectRadius);
+            }
+
+            item.style.transform = `scale(${scale})`;
+        });
+    }
+
+    resetScales() {
+        this.items.forEach(item => {
+            item.style.transform = 'scale(1)';
+        });
+    }
+}
+
+// ========================================
 // Dock Controller
 // ========================================
 
@@ -134,12 +187,21 @@ class DockController {
             const externalUrl = dockItem.dataset.external;
             const internalUrl = dockItem.dataset.internal;
 
+            // Bounce animation
+            dockItem.classList.add('bouncing');
+            setTimeout(() => dockItem.classList.remove('bouncing'), 500);
+
             if (externalUrl) {
-                // External link - navigate
-                window.location.href = externalUrl;
+                // External link - navigate after bounce starts
+                setTimeout(() => {
+                    window.location.href = externalUrl;
+                }, 150);
             } else if (internalUrl) {
                 // Internal app - open modal
                 this.modalManager.open(internalUrl, appName);
+            } else if (appName === 'settings') {
+                // Settings - dispatch event
+                window.dispatchEvent(new CustomEvent('openSettings'));
             }
         });
     }
@@ -161,6 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize modal and dock
     const modalManager = new ModalManager();
     new DockController(modalManager);
+    new DockMagnifier();
 
     // Respect reduced motion
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {

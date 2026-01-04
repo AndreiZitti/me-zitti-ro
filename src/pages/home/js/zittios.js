@@ -111,101 +111,6 @@ class ModalManager {
     }
 }
 
-// ========================================
-// Dock Magnifier
-// ========================================
-
-class DockMagnifier {
-    constructor() {
-        this.dock = document.getElementById('dock');
-        if (!this.dock) return;
-
-        this.items = Array.from(this.dock.querySelectorAll('.dock-item'));
-        this.maxScale = 1.5;
-        this.effectRadius = 80;
-        this.isActive = true;
-
-        this.bindEvents();
-    }
-
-    bindEvents() {
-        this.dock.addEventListener('mousemove', (e) => this.handleMouseMove(e));
-        this.dock.addEventListener('mouseleave', () => this.resetScales());
-
-        // Disable magnification on mobile
-        if ('ontouchstart' in window) {
-            this.isActive = false;
-        }
-    }
-
-    handleMouseMove(e) {
-        if (!this.isActive) return;
-
-        const mouseX = e.clientX;
-
-        this.items.forEach(item => {
-            const itemRect = item.getBoundingClientRect();
-            const itemCenterX = itemRect.left + itemRect.width / 2;
-            const distance = Math.abs(mouseX - itemCenterX);
-
-            let scale = 1;
-            if (distance < this.effectRadius) {
-                scale = 1 + (this.maxScale - 1) * (1 - distance / this.effectRadius);
-            }
-
-            item.style.transform = `scale(${scale})`;
-        });
-    }
-
-    resetScales() {
-        this.items.forEach(item => {
-            item.style.transform = 'scale(1)';
-        });
-    }
-}
-
-// ========================================
-// Dock Controller
-// ========================================
-
-class DockController {
-    constructor(modalManager) {
-        this.modalManager = modalManager;
-        this.dock = document.querySelector('.dock');
-
-        if (!this.dock) return;
-
-        this.bindEvents();
-    }
-
-    bindEvents() {
-        this.dock.addEventListener('click', (e) => {
-            const dockItem = e.target.closest('.dock-item');
-            if (!dockItem) return;
-
-            const appName = dockItem.dataset.app;
-            const externalUrl = dockItem.dataset.external;
-            const internalUrl = dockItem.dataset.internal;
-
-            // Bounce animation
-            dockItem.classList.add('bouncing');
-            setTimeout(() => dockItem.classList.remove('bouncing'), 500);
-
-            if (externalUrl) {
-                // External link - navigate after bounce starts
-                setTimeout(() => {
-                    window.location.href = externalUrl;
-                }, 150);
-            } else if (internalUrl) {
-                // Internal app - open modal
-                this.modalManager.open(internalUrl, appName);
-            } else if (appName === 'settings') {
-                // Settings - dispatch event
-                window.dispatchEvent(new CustomEvent('openSettings'));
-            }
-        });
-    }
-}
 
 // ========================================
 // Menu Bar
@@ -280,6 +185,8 @@ class DesktopIconsController {
     constructor(modalManager) {
         this.modalManager = modalManager;
         this.container = document.querySelector('.desktop-icons');
+        this.hint = document.getElementById('icon-hint');
+        this.hintText = document.getElementById('icon-hint-text');
 
         if (!this.container) return;
 
@@ -287,6 +194,10 @@ class DesktopIconsController {
     }
 
     bindEvents() {
+        // Apps that should open full screen instead of in modal
+        const fullScreenApps = ['now', 'cosmos'];
+
+        // Click events
         this.container.addEventListener('click', (e) => {
             const icon = e.target.closest('.desktop-icon');
             if (!icon) return;
@@ -295,23 +206,54 @@ class DesktopIconsController {
             const externalUrl = icon.dataset.external;
             const internalUrl = icon.dataset.internal;
 
-            if (externalUrl) {
+            if (appName === 'profile') {
+                window.dispatchEvent(new CustomEvent('openProfile'));
+            } else if (externalUrl) {
                 window.location.href = externalUrl;
+            } else if (internalUrl && fullScreenApps.includes(appName)) {
+                // Open full screen
+                window.location.href = internalUrl;
             } else if (internalUrl) {
                 this.modalManager.open(internalUrl, appName);
             }
         });
+
+        // Hover events for hint tooltip - attach to each icon directly
+        const icons = this.container.querySelectorAll('.desktop-icon');
+        icons.forEach(icon => {
+            icon.addEventListener('mouseenter', () => {
+                if (icon.dataset.hint) {
+                    this.showHint(icon.dataset.hint);
+                }
+            });
+
+            icon.addEventListener('mouseleave', () => {
+                this.hideHint();
+            });
+        });
+    }
+
+    showHint(text) {
+        if (!this.hint || !this.hintText) return;
+        this.hintText.textContent = text;
+        this.hint.classList.add('visible');
+    }
+
+    hideHint() {
+        if (!this.hint) return;
+        this.hint.classList.remove('visible');
     }
 }
 
 // ========================================
-// Settings Panel
+// Profile Panel
 // ========================================
 
-class SettingsPanel {
+class ProfilePanel {
     constructor() {
-        this.overlay = document.getElementById('settings-overlay');
-        this.closeBtn = document.getElementById('settings-close');
+        this.overlay = document.getElementById('profile-overlay');
+        this.closeBtn = document.getElementById('profile-close');
+        this.loginBtn = document.getElementById('profile-login-btn');
         this.backgroundOptions = document.querySelectorAll('.background-option');
         this.storageKey = 'zittios-background';
 
@@ -322,8 +264,8 @@ class SettingsPanel {
     }
 
     bindEvents() {
-        // Listen for openSettings event
-        window.addEventListener('openSettings', () => this.open());
+        // Listen for openProfile event
+        window.addEventListener('openProfile', () => this.open());
 
         // Close button
         this.closeBtn?.addEventListener('click', () => this.close());
@@ -340,6 +282,11 @@ class SettingsPanel {
             if (e.key === 'Escape' && this.isOpen()) {
                 this.close();
             }
+        });
+
+        // Login button (placeholder for now)
+        this.loginBtn?.addEventListener('click', () => {
+            alert('Login coming soon!');
         });
 
         // Background options
@@ -402,14 +349,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize menu bar
     new MenuBar();
 
-    // Initialize modal, dock, and desktop icons
+    // Initialize modal and desktop icons
     const modalManager = new ModalManager();
-    new DockController(modalManager);
-    new DockMagnifier();
     new DesktopIconsController(modalManager);
 
-    // Initialize settings panel
-    new SettingsPanel();
+    // Initialize profile panel
+    new ProfilePanel();
 
     // Respect reduced motion
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {

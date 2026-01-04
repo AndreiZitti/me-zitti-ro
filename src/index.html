@@ -94,9 +94,9 @@
             </div>
         </div>
 
-        <!-- Desktop Icons (scattered organically) -->
+        <!-- Desktop Icons (organic cluster) -->
         <div class="desktop-icons">
-            <button class="desktop-icon" data-app="now" data-internal="pages/now/index.html" style="--x: 85%; --y: 12%;">
+            <button class="desktop-icon" data-app="now" data-internal="pages/now/index.html" data-hint="What I'm currently up to" style="--x: 82%; --y: 18%;">
                 <div class="desktop-icon-img">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <circle cx="12" cy="12" r="10"></circle>
@@ -105,15 +105,28 @@
                 </div>
                 <span class="desktop-icon-label">Now</span>
             </button>
-            <button class="desktop-icon" data-app="stars" data-internal="pages/star-map/index.html" style="--x: 78%; --y: 28%;">
+            <button class="desktop-icon" data-app="cosmos" data-internal="pages/star-map/index.html" data-hint="Collection of my astronomy photographs" style="--x: 88%; --y: 28%;">
+                <div class="desktop-icon-img">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <line x1="12" y1="2" x2="12" y2="4"></line>
+                        <line x1="12" y1="20" x2="12" y2="22"></line>
+                        <line x1="2" y1="12" x2="4" y2="12"></line>
+                        <line x1="20" y1="12" x2="22" y2="12"></line>
+                    </svg>
+                </div>
+                <span class="desktop-icon-label">Cosmos Map</span>
+            </button>
+            <button class="desktop-icon" data-app="stargazing" data-external="https://astro.zitti.ro" data-hint="Find stargazing spots and check weather conditions" style="--x: 80%; --y: 40%;">
                 <div class="desktop-icon-img">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                     </svg>
                 </div>
-                <span class="desktop-icon-label">Stars</span>
+                <span class="desktop-icon-label">Stargazing</span>
             </button>
-            <button class="desktop-icon" data-app="library" data-internal="pages/book-library/index.html" style="--x: 88%; --y: 42%;">
+            <button class="desktop-icon" data-app="library" data-internal="pages/book-library/index.html" data-hint="Books I've read (under construction)" style="--x: 90%; --y: 52%;">
                 <div class="desktop-icon-img">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
@@ -122,7 +135,7 @@
                 </div>
                 <span class="desktop-icon-label">Library</span>
             </button>
-            <button class="desktop-icon" data-app="games" data-external="https://games.zitti.ro" style="--x: 75%; --y: 58%;">
+            <button class="desktop-icon" data-app="games" data-external="https://games.zitti.ro" data-hint="Play games with friends, in person or online" style="--x: 78%; --y: 62%;">
                 <div class="desktop-icon-img">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <rect x="2" y="4" width="20" height="16" rx="2"></rect>
@@ -133,7 +146,7 @@
                 </div>
                 <span class="desktop-icon-label">Games</span>
             </button>
-            <button class="desktop-icon" data-app="travel" data-external="https://travelling.zitti.ro" style="--x: 85%; --y: 72%;">
+            <button class="desktop-icon" data-app="travel" data-external="https://travelling.zitti.ro" data-hint="Record and share your travels" style="--x: 88%; --y: 72%;">
                 <div class="desktop-icon-img">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <circle cx="12" cy="12" r="10"></circle>
@@ -143,70 +156,31 @@
                 </div>
                 <span class="desktop-icon-label">Travel</span>
             </button>
-        </div>
-
-        <!-- Dock -->
-        <nav class="dock" id="dock">
-            <button class="dock-item" data-app="projects" data-external="https://projects.zitti.ro" data-tooltip="Projects">
-                <div class="dock-icon">
+            <button class="desktop-icon" data-app="projects" data-external="https://projects.zitti.ro" data-hint="My portfolio of work and experiments" style="--x: 80%; --y: 82%;">
+                <div class="desktop-icon-img">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <polyline points="4 17 10 11 4 5"></polyline>
                         <line x1="12" y1="19" x2="20" y2="19"></line>
                     </svg>
                 </div>
+                <span class="desktop-icon-label">Projects</span>
             </button>
-            <button class="dock-item" data-app="stars" data-internal="pages/star-map/index.html" data-tooltip="Stars">
-                <div class="dock-icon">
+            <button class="desktop-icon" data-app="profile" data-hint="Log in or customize your desktop" style="--x: 90%; --y: 92%;">
+                <div class="desktop-icon-img">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
                     </svg>
                 </div>
+                <span class="desktop-icon-label">Profile</span>
             </button>
-            <button class="dock-item" data-app="library" data-internal="pages/book-library/index.html" data-tooltip="Library">
-                <div class="dock-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                    </svg>
-                </div>
-            </button>
-            <button class="dock-item" data-app="games" data-external="https://games.zitti.ro" data-tooltip="Games">
-                <div class="dock-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                        <circle cx="8" cy="12" r="2"></circle>
-                        <circle cx="16" cy="10" r="1"></circle>
-                        <circle cx="16" cy="14" r="1"></circle>
-                    </svg>
-                </div>
-            </button>
-            <button class="dock-item" data-app="travel" data-external="https://travelling.zitti.ro" data-tooltip="Travel">
-                <div class="dock-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="2" y1="12" x2="22" y2="12"></line>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                    </svg>
-                </div>
-            </button>
-            <button class="dock-item" data-app="now" data-internal="pages/now/index.html" data-tooltip="Now">
-                <div class="dock-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                </div>
-            </button>
-            <div class="dock-divider"></div>
-            <button class="dock-item" data-app="settings" data-tooltip="Settings">
-                <div class="dock-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
-                </div>
-            </button>
-        </nav>
+        </div>
+
+    </div>
+
+    <!-- Icon Hint Tooltip -->
+    <div class="icon-hint" id="icon-hint" aria-hidden="true">
+        <span class="icon-hint-text" id="icon-hint-text"></span>
     </div>
 
     <!-- Modal Overlay -->
@@ -222,21 +196,39 @@
         </div>
     </div>
 
-    <!-- Settings Panel -->
-    <div class="settings-overlay" id="settings-overlay">
-        <div class="settings-panel">
-            <div class="settings-header">
-                <h2 class="settings-title">Settings</h2>
-                <button class="settings-close" id="settings-close" aria-label="Close">
+    <!-- Profile Panel -->
+    <div class="profile-overlay" id="profile-overlay">
+        <div class="profile-panel">
+            <div class="profile-header">
+                <h2 class="profile-title">Profile</h2>
+                <button class="profile-close" id="profile-close" aria-label="Close">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
                 </button>
             </div>
-            <div class="settings-content">
-                <div class="settings-section">
-                    <h3 class="settings-section-title">Desktop Background</h3>
+            <div class="profile-content">
+                <!-- Login Section -->
+                <div class="profile-section">
+                    <h3 class="profile-section-title">Account</h3>
+                    <div class="profile-login">
+                        <div class="profile-avatar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <p class="profile-guest-text">You're browsing as a guest</p>
+                        <button class="profile-login-btn" id="profile-login-btn">
+                            <span>Sign in</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Desktop Background Section -->
+                <div class="profile-section">
+                    <h3 class="profile-section-title">Desktop Background</h3>
                     <div class="background-options">
                         <button class="background-option active" data-bg="starfield">
                             <div class="background-preview bg-starfield"></div>

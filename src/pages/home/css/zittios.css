@@ -97,6 +97,58 @@ body {
 }
 
 /* ========================================
+   Hero
+   ======================================== */
+
+.hero {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.hero-name {
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--text-primary);
+    opacity: 0.9;
+    margin-bottom: 8px;
+    text-shadow: 0 0 40px rgba(99, 102, 241, 0.3);
+}
+
+.hero-tagline {
+    font-size: clamp(0.875rem, 2vw, 1.125rem);
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    opacity: 0.8;
+}
+
+/* Hero entrance animation */
+.hero {
+    opacity: 0;
+    animation: heroFadeIn 1s ease forwards;
+    animation-delay: 0.6s;
+}
+
+@keyframes heroFadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero {
+        opacity: 1;
+        animation: none;
+    }
+}
+
+/* ========================================
    Dock
    ======================================== */
 

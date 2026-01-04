@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Library - Admin Panel</title>
+    <link rel="stylesheet" type="text/css" href="css/default.css" />
+    <link rel="stylesheet" type="text/css" href="css/admin.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="clearfix">
+        <h1>Book Library Admin Panel</h1>
+        <nav class="admin-nav">
+          <a href="index.html" class="btn btn-secondary">← Back to Library</a>
+        </nav>
+      </header>
+
+      <div class="admin-controls">
+        <button id="addBookBtn" class="btn btn-primary">+ Add New Book</button>
+        <div class="search-bar">
+          <input
+            type="text"
+            id="searchBooks"
+            placeholder="Search books by title, author, or genre..."
+          />
+        </div>
+      </div>
+
+      <!-- Add/Edit Book Modal -->
+      <div id="bookModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="modalTitle">Add New Book</h2>
+            <span class="close">&times;</span>
+          </div>
+          <form id="bookForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="bookTitle">Title *</label>
+                <input type="text" id="bookTitle" required />
+              </div>
+              <div class="form-group">
+                <label for="bookAuthor">Author *</label>
+                <input type="text" id="bookAuthor" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="bookGenre">Genre *</label>
+                <input
+                  type="text"
+                  id="bookGenre"
+                  required
+                  placeholder="e.g. Science Fiction, Self-Help"
+                />
+              </div>
+              <div class="form-group">
+                <label for="bookCategory">Category *</label>
+                <select id="bookCategory" required>
+                  <option value="">Select Category</option>
+                  <option value="science">Science</option>
+                  <option value="horror">Horror</option>
+                  <option value="dystopian">Dystopian</option>
+                  <option value="ai">AI & Technology</option>
+                  <option value="self-help">Self-Help</option>
+                  <option value="business">Business</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="bookRating">Rating</label>
+              <input
+                type="text"
+                id="bookRating"
+                placeholder="e.g. 8/10, 4.5/5"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="bookQuote">Memorable Quote</label>
+              <textarea
+                id="bookQuote"
+                rows="3"
+                placeholder="Enter a memorable quote from the book"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="bookDescription">Description</label>
+              <textarea
+                id="bookDescription"
+                rows="4"
+                placeholder="Brief description of the book"
+              ></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" id="cancelBtn">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">Save Book</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Books Table -->
+      <div class="books-table-container">
+        <table id="booksTable" class="books-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Genre</th>
+              <th>Category</th>
+              <th>Rating</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="booksTableBody">
+            <!-- Books will be populated here -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Delete Confirmation Modal -->
+      <div id="deleteModal" class="modal">
+        <div class="modal-content small">
+          <div class="modal-header">
+            <h2>Confirm Delete</h2>
+            <span class="close">&times;</span>
+          </div>
+          <div class="modal-body">
+            <p>
+              Are you sure you want to delete "<span id="deleteBookTitle"></span
+              >"?
+            </p>
+            <p>This action cannot be undone.</p>
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              id="cancelDeleteBtn"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+  </body>
+</html>

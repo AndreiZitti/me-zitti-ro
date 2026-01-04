@@ -1,0 +1,552 @@
+// Three.js 3D Bookshelf Scene Manager
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import Book3D from './Book3D.js';
+
+class Bookshelf3D {
+  constructor(containerElement, bookLibrary) {
+    this.container = containerElement;
+    this.bookLibrary = bookLibrary;
+    this.books3D = []; // Array of { mesh, bookData, originalPosition, originalRotation }
+    this.selectedBook = null;
+    this.hoveredBook = null;
+    this.raycaster = new THREE.Raycaster();
+    this.mouse = new THREE.Vector2();
+
+    // Scene setup
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0xE8DCC4); // Light beige
+
+    // Get container dimensions
+    const containerWidth = this.container.clientWidth;
+    const containerHeight = this.container.clientHeight;
+
+    // Camera setup
+    this.camera = new THREE.PerspectiveCamera(
+      55, // FOV (slightly wider for better view)
+      containerWidth / containerHeight,
+      0.1,
+      1000
+    );
+    this.camera.position.set(0, 5, 8); // Much closer to books (was 14, now 8)
+    this.camera.lookAt(0, 0, 0);
+
+    // Renderer setup
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer.setSize(containerWidth, containerHeight);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.0;
+    this.container.appendChild(this.renderer.domElement);
+
+    // Loading manager
+    this.loadingManager = new THREE.LoadingManager();
+    this.loadingManager.onProgress = (url, loaded, total) => {
+      console.log(`Loading: ${loaded}/${total} - ${url}`);
+    };
+    this.loadingManager.onLoad = () => {
+      console.log('All assets loaded!');
+      this.hideLoadingScreen();
+    };
+
+    // Texture loader
+    this.textureLoader = new THREE.TextureLoader(this.loadingManager);
+
+    // Materials storage
+    this.materials = {
+      wood: null,
+      bookCategories: {}
+    };
+
+    // Event listeners
+    window.addEventListener('resize', this.onWindowResize.bind(this));
+    this.renderer.domElement.addEventListener('click', this.onMouseClick.bind(this));
+    this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
+
+    // Clock for delta time
+    this.clock = new THREE.Clock();
+
+    // Initialize
+    this.init();
+  }
+
+  async init() {
+    this.showLoadingScreen();
+
+    // Load environment and textures
+    await this.loadEnvironment();
+    await this.loadWoodTextures();
+    this.setupLighting();
+    this.createShelves();
+    this.createBooks();
+
+    // Start render loop
+    this.animate();
+  }
+
+  showLoadingScreen() {
+    // Create a simple loading overlay
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = 'loading-screen';
+    loadingDiv.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      z-index: 9999;
+    `;
+    loadingDiv.innerHTML = '<div>Loading 3D Bookshelf...</div>';
+    document.body.appendChild(loadingDiv);
+  }
+
+  hideLoadingScreen() {
+    const loadingDiv = document.getElementById('loading-screen');
+    if (loadingDiv) {
+      loadingDiv.remove();
+    }
+  }
+
+  async loadEnvironment() {
+    // Skip HDRI loading - use simple color background (already set in constructor)
+    console.log('Using simple background (no HDRI)');
+    return Promise.resolve();
+  }
+
+  async loadWoodTextures() {
+    return new Promise((resolve, reject) => {
+      const basePath = 'assets/Dark Wood Texture/textures/';
+
+      // Load diffuse (color) texture
+      const diffuseTexture = this.textureLoader.load(
+        basePath + 'dark_wood_diff_4k.jpg',
+        () => console.log('Wood diffuse texture loaded')
+      );
+
+      // For now, we'll use a simple material
+      // EXR files need special loader, so we'll skip normal/roughness for now
+      // and add them in Phase 7 (Polish)
+
+      this.materials.wood = new THREE.MeshStandardMaterial({
+        map: diffuseTexture,
+        roughness: 0.8,
+        metalness: 0.1
+      });
+
+      resolve();
+    });
+  }
+
+  setupLighting() {
+    // Ambient light - soft overall illumination from HDRI
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    this.scene.add(ambientLight);
+
+    // Main directional light (sunlight from fireplace area)
+    const dirLight = new THREE.DirectionalLight(0xffd9b3, 1.2);
+    dirLight.position.set(5, 8, 7);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 2048;
+    dirLight.shadow.mapSize.height = 2048;
+    dirLight.shadow.camera.near = 0.5;
+    dirLight.shadow.camera.far = 50;
+    dirLight.shadow.camera.left = -10;
+    dirLight.shadow.camera.right = 10;
+    dirLight.shadow.camera.top = 10;
+    dirLight.shadow.camera.bottom = -10;
+    dirLight.shadow.bias = -0.0001;
+    this.scene.add(dirLight);
+
+    // Warm point light from fireplace direction
+    const fireplaceLight = new THREE.PointLight(0xff6633, 1.5, 30);
+    fireplaceLight.position.set(-3, 2, 10);
+    this.scene.add(fireplaceLight);
+
+    // Rim light for depth
+    const rimLight = new THREE.DirectionalLight(0xaaccff, 0.3);
+    rimLight.position.set(-5, 3, -5);
+    this.scene.add(rimLight);
+
+    // Soft fill light from below
+    const fillLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.4);
+    this.scene.add(fillLight);
+  }
+
+  createShelves() {
+    const shelfCount = Math.ceil(this.bookLibrary.books.length / this.bookLibrary.booksPerShelf);
+    const shelfSpacing = 4.5; // Vertical spacing between shelves
+    const shelfThickness = 0.45; // 3x original thickness (0.15 * 3)
+
+    for (let i = 0; i < shelfCount; i++) {
+      const shelfGeometry = new THREE.BoxGeometry(8, shelfThickness, 4); // Shorter and narrower shelf
+      const shelfMesh = new THREE.Mesh(shelfGeometry, this.materials.wood);
+
+      // Position shelves vertically
+      shelfMesh.position.y = -i * shelfSpacing;
+      shelfMesh.position.z = 0; // Center shelf
+      shelfMesh.receiveShadow = true;
+
+      this.scene.add(shelfMesh);
+    }
+  }
+
+  createBooks() {
+    const books = this.bookLibrary.books;
+    const booksPerShelf = this.bookLibrary.booksPerShelf;
+    const shelfSpacing = 4.5;
+    const shelfWidth = 7; // Usable width for books (reduced to match shorter shelf)
+    const bookSpacing = 0.04; // Minimal gap between books - nearly touching like real shelf
+
+    let currentShelf = 0;
+    let xPosition = -shelfWidth / 2; // Start from left edge
+
+    books.forEach((bookData, index) => {
+      // Calculate which shelf this book belongs to
+      const shelfIndex = Math.floor(index / booksPerShelf);
+
+      // If we've moved to a new shelf, reset x position
+      if (shelfIndex !== currentShelf) {
+        currentShelf = shelfIndex;
+        xPosition = -shelfWidth / 2;
+      }
+
+      // Consistent randomization per book (using book ID as seed)
+      // This ensures each book gets unique but consistent dimensions
+      const seed = bookData.id || index;
+      const seededRandom = (seed) => {
+        // Simple seeded random function
+        const x = Math.sin(seed * 12345.6789) * 10000;
+        return x - Math.floor(x);
+      };
+
+      const dimensions = {
+        width: 0.25 + seededRandom(seed) * 0.10,        // 0.25 - 0.35 (spine width - tighter range)
+        height: 3.5 + seededRandom(seed + 100) * 1.0,   // 3.5 - 4.5 (book height)
+        depth: 2.2 + seededRandom(seed + 200) * 0.8     // 2.2 - 3.0 (page width/book depth)
+      };
+
+      // Calculate Y position (shelf height)
+      // Shelf is at -shelfIndex * shelfSpacing
+      // Shelf thickness is 0.45, so top of shelf is at shelf.y + 0.225
+      // Book bottom should be at shelf top
+      // Since book position is at its center, book.y = shelfTop + book.height/2
+      const shelfThickness = 0.45; // Same as in createShelves()
+      const shelfY = -shelfIndex * shelfSpacing;
+      const shelfTop = shelfY + shelfThickness / 2; // Half of shelf thickness
+      const bookY = shelfTop + dimensions.height / 2 -1;
+
+      // Calculate Z position (books sitting on shelf)
+      // Shelf depth is 4 units, centered at z=0
+      // Books have depth of ~2.2-3.0 units, so they fit comfortably on shelf
+      // Center books on the shelf at z=0
+      const bookZ = 1.5;
+
+      const position = [
+        xPosition + dimensions.width / 2,
+        bookY, // Properly positioned on shelf
+        bookZ // Aligned with shelf back edge
+      ];
+
+      // Create book (async to support cover loading)
+      const book3D = new Book3D(bookData, position, dimensions);
+
+      // Store reference
+      this.books3D.push(book3D);
+
+      // Progressive loading: Add delay based on index (150ms per book)
+      // Books appear from left to right
+      const loadDelay = index * 150;
+
+      setTimeout(() => {
+        book3D.createMesh().then(() => {
+          // Add to scene after creation
+          if (book3D.mesh) {
+            // Start with opacity 0 for fade-in effect
+            book3D.mesh.traverse((child) => {
+              if (child.isMesh && child.material) {
+                child.material.transparent = true;
+                child.material.opacity = 0;
+              }
+            });
+
+            this.scene.add(book3D.mesh);
+
+            // Fade in animation
+            const fadeInDuration = 1500; // 1.5 seconds fade in (slower)
+            const fadeStartTime = Date.now();
+
+            const fadeIn = () => {
+              const elapsed = Date.now() - fadeStartTime;
+              const progress = Math.min(elapsed / fadeInDuration, 1);
+
+              book3D.mesh.traverse((child) => {
+                if (child.isMesh && child.material) {
+                  child.material.opacity = progress;
+                }
+              });
+
+              if (progress < 1) {
+                requestAnimationFrame(fadeIn);
+              } else {
+                // Reset transparency after fade complete
+                book3D.mesh.traverse((child) => {
+                  if (child.isMesh && child.material) {
+                    child.material.transparent = false;
+                    child.material.opacity = 1;
+                  }
+                });
+              }
+            };
+
+            fadeIn();
+          }
+        }).catch(error => {
+          // Silently handle error or use a fallback
+        });
+      }, loadDelay);
+
+      // Move x position for next book
+      xPosition += dimensions.width + bookSpacing;
+    });
+  }
+
+  onWindowResize() {
+    const containerWidth = this.container.clientWidth;
+    const containerHeight = this.container.clientHeight;
+
+    this.camera.aspect = containerWidth / containerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(containerWidth, containerHeight);
+  }
+
+  onMouseMove(event) {
+    // Get canvas bounding rect for accurate mouse position
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    // Detect hover
+    this.detectHover();
+  }
+
+  detectHover() {
+    // Don't detect hover if a book is already selected
+    if (this.selectedBook) return;
+
+    // Raycast to detect book hover
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+
+    // Get all book meshes
+    const allBookMeshes = [];
+    this.books3D.forEach(book3D => {
+      if (book3D.mesh) {
+        allBookMeshes.push(book3D.mesh);
+      }
+    });
+
+    // Use recursive: true to detect all nested children
+    const intersects = this.raycaster.intersectObjects(allBookMeshes, true);
+
+    if (intersects.length > 0) {
+      // Find which book was hovered
+      let hoveredObject = intersects[0].object;
+
+      // Traverse up to find parent book
+      let hoveredBook = null;
+      let currentObject = hoveredObject;
+      while (currentObject && !hoveredBook) {
+        hoveredBook = this.books3D.find(b => b.mesh === currentObject);
+        currentObject = currentObject.parent;
+      }
+
+      if (hoveredBook && hoveredBook !== this.hoveredBook) {
+        // New book hovered
+        if (this.hoveredBook) {
+          this.hoveredBook.animateHoverOut();
+        }
+        this.hoveredBook = hoveredBook;
+        this.hoveredBook.animateHoverIn();
+        this.renderer.domElement.style.cursor = 'pointer';
+      }
+    } else {
+      // No book hovered
+      if (this.hoveredBook) {
+        this.hoveredBook.animateHoverOut();
+        this.hoveredBook = null;
+        this.renderer.domElement.style.cursor = 'default';
+      }
+    }
+  }
+
+  onMouseClick(event) {
+    // Update mouse position first
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    // Raycast to detect book clicks
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+
+    // Get all book meshes (including all nested children recursively)
+    const allBookMeshes = [];
+    this.books3D.forEach(book3D => {
+      if (book3D.mesh) {
+        allBookMeshes.push(book3D.mesh);
+      }
+    });
+
+    // Use recursive: true to detect all nested children (coverPivot, etc.)
+    const intersects = this.raycaster.intersectObjects(allBookMeshes, true);
+
+    if (intersects.length > 0) {
+      // Find which book was clicked
+      let clickedObject = intersects[0].object;
+
+      // If we clicked a child, find the parent book by traversing up
+      let clickedBook = null;
+
+      // Traverse up the object hierarchy to find the book
+      let currentObject = clickedObject;
+      while (currentObject && !clickedBook) {
+        clickedBook = this.books3D.find(b => b.mesh === currentObject);
+        currentObject = currentObject.parent;
+      }
+
+      if (clickedBook) {
+        console.log('Book clicked:', clickedBook.bookData.title);
+        console.log('Is already selected?', this.selectedBook === clickedBook);
+
+        // If this book is already selected and pulled out
+        if (this.selectedBook === clickedBook) {
+          // Detect if click was on left or right half of screen
+          // mouse.x ranges from -1 (left) to +1 (right)
+          const clickedRight = this.mouse.x > 0;
+
+          if (clickedRight) {
+            console.log('Right click - next page');
+            clickedBook.nextPage();
+          } else {
+            console.log('Left click - previous page');
+            clickedBook.previousPage();
+          }
+        } else {
+          // Otherwise, pull out the book
+          console.log('Opening book (pulling out):', clickedBook.bookData.title);
+          this.openBook(clickedBook);
+        }
+        return;
+      }
+    }
+
+    // If no book was clicked, close current book
+    this.closeBook();
+  }
+
+  openBook(book3D) {
+    // Close previous book if any
+    if (this.selectedBook && this.selectedBook !== book3D) {
+      this.selectedBook.animateClose();
+    }
+
+    // Clear hover state and reset book position before opening
+    if (this.hoveredBook) {
+      this.hoveredBook.animateHoverOut(); // Properly exit hover state
+      this.hoveredBook = null;
+    }
+
+    // If the book being opened has hover offset, reset it first
+    if (book3D.isHovered) {
+      book3D.animateHoverOut();
+    }
+
+    // Move book to center of screen, zoomed in much closer for better viewing
+    const targetPosition = new THREE.Vector3(
+      0, // Center horizontally
+      3, // Center vertically at comfortable viewing height
+      5 // Close to camera for detailed view (camera is at z=8, so book at z=5 is 3 units in front)
+    );
+
+    // Rotate book to show front cover facing user
+    // On shelf: Spine faces forward (+Z)
+    // To show cover: Rotate -90° around Y (turn to show front cover)
+    const targetRotation = new THREE.Euler(-Math.PI / 6, -Math.PI / 2, 0); // -30° tilt (was -20°), -90° Y turn to show cover
+
+    book3D.animateOpen(targetPosition, targetRotation);
+
+    // Store selected book
+    this.selectedBook = book3D;
+  }
+
+  closeBook() {
+    if (this.selectedBook) {
+      this.selectedBook.animateClose();
+      this.selectedBook = null;
+    }
+
+    // Reset hover state
+    this.hoveredBook = null;
+  }
+
+  // Method to update books based on filters/sorting
+  updateBooks(filteredBooks) {
+    // Clear existing books from scene
+    this.books3D.forEach(book3D => {
+      this.scene.remove(book3D.mesh);
+    });
+    this.books3D = [];
+
+    // Close any open book
+    this.selectedBook = null;
+
+    // Temporarily override bookLibrary.books with filtered/sorted books
+    const originalBooks = this.bookLibrary.books;
+    this.bookLibrary.books = filteredBooks;
+
+    // Recreate books
+    this.createBooks();
+
+    // Restore original books array
+    this.bookLibrary.books = originalBooks;
+  }
+
+  // Public method to be called by bookLibrary when filters/sort change
+  refreshDisplay(filteredBooks) {
+    this.updateBooks(filteredBooks);
+  }
+
+  animate() {
+    requestAnimationFrame(this.animate.bind(this));
+
+    const deltaTime = this.clock.getDelta();
+
+    // Update all book animations
+    this.books3D.forEach(book3D => {
+      book3D.update(deltaTime);
+    });
+
+    // No controls to update - static camera
+    this.renderer.render(this.scene, this.camera);
+  }
+}
+
+// Initialize when DOM is ready and bookLibrary is available
+window.addEventListener('DOMContentLoaded', () => {
+  // Wait a bit for bookLibrary.js to initialize
+  setTimeout(() => {
+    const container = document.getElementById('bookshelf-3d-container');
+    if (container && window.bookLibrary) {
+      window.bookshelf3D = new Bookshelf3D(container, window.bookLibrary);
+    } else {
+      console.error('Container or bookLibrary not found');
+    }
+  }, 100);
+});

@@ -24,7 +24,7 @@ const icons: DesktopIconData[] = [
     id: 'now',
     label: 'Now',
     hint: "What I'm currently up to",
-    internal: 'pages/now/index.html',
+    internal: '/pages/now/index.html',
     x: '82%',
     y: '18%',
     icon: (
@@ -38,7 +38,7 @@ const icons: DesktopIconData[] = [
     id: 'cosmos',
     label: 'Cosmos Map',
     hint: 'Collection of my astronomy photographs',
-    internal: 'pages/star-map/index.html',
+    internal: '/pages/star-map/index.html',
     x: '88%',
     y: '28%',
     icon: (
@@ -69,7 +69,7 @@ const icons: DesktopIconData[] = [
     id: 'library',
     label: 'Library',
     hint: "Books I've read (under construction)",
-    internal: 'pages/book-library/index.html',
+    internal: '/pages/book-library/index.html',
     x: '90%',
     y: '52%',
     icon: (

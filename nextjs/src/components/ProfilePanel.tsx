@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ProfilePanelProps {
   isOpen: boolean;
@@ -10,6 +12,8 @@ interface ProfilePanelProps {
 export default function ProfilePanel({ isOpen, onClose }: ProfilePanelProps) {
   const [selectedBackground, setSelectedBackground] = useState('starfield');
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const router = useRouter();
+  const { user, loading, supabase } = useAuth();
 
   useEffect(() => {
     // Load saved background preference
@@ -54,6 +58,23 @@ export default function ProfilePanel({ isOpen, onClose }: ProfilePanelProps) {
     localStorage.setItem('zittios-background', bg);
   };
 
+  const handleSignIn = () => {
+    onClose();
+    router.push('/login');
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    onClose();
+    router.refresh();
+  };
+
+  // Get user initials for avatar
+  const getInitials = () => {
+    if (!user?.email) return '??';
+    return user.email.substring(0, 2).toUpperCase();
+  };
+
   return (
     <div
       className={`fixed inset-0 z-[100] flex items-center justify-center bg-[rgba(5,8,15,0.7)] backdrop-blur transition-all duration-normal ${
@@ -90,23 +111,55 @@ export default function ProfilePanel({ isOpen, onClose }: ProfilePanelProps) {
             <h3 className="text-xs font-medium uppercase tracking-wider text-text-muted mb-3">
               Account
             </h3>
-            <div className="flex flex-col items-center p-5 bg-white/[0.03] border border-[var(--border-subtle)] rounded-md">
-              <div className="w-14 h-14 flex items-center justify-center bg-[rgba(99,102,241,0.1)] border border-[var(--border-subtle)] rounded-full text-text-muted mb-3">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-7 h-7">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
+
+            {loading ? (
+              // Loading state
+              <div className="flex flex-col items-center p-5 bg-white/[0.03] border border-[var(--border-subtle)] rounded-md">
+                <div className="w-14 h-14 bg-white/10 rounded-full animate-pulse mb-3" />
+                <div className="w-32 h-4 bg-white/10 rounded animate-pulse" />
               </div>
-              <p className="text-sm text-text-secondary mb-4">
-                You&apos;re browsing as a guest
-              </p>
-              <button
-                onClick={() => alert('Login coming soon!')}
-                className="flex items-center justify-center gap-2 px-6 py-2.5 bg-accent-primary border-none rounded-sm text-white text-sm font-medium cursor-pointer transition-all duration-fast hover:bg-accent-secondary hover:-translate-y-px"
-              >
-                Sign in
-              </button>
-            </div>
+            ) : user ? (
+              // Logged in state
+              <div className="flex flex-col items-center p-5 bg-white/[0.03] border border-[var(--border-subtle)] rounded-md">
+                <div className="w-14 h-14 flex items-center justify-center bg-accent-primary rounded-full text-white text-lg font-semibold mb-3">
+                  {getInitials()}
+                </div>
+                <p className="text-sm text-text-primary font-medium truncate max-w-full">
+                  {user.email}
+                </p>
+                <p className="text-xs text-text-muted mt-1">
+                  Signed in
+                </p>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 mt-4 px-4 py-2 bg-white/5 hover:bg-white/10 border border-[var(--border-subtle)] hover:border-[var(--border-hover)] rounded-sm text-text-secondary hover:text-text-primary text-sm cursor-pointer transition-all duration-fast"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              // Not logged in state
+              <div className="flex flex-col items-center p-5 bg-white/[0.03] border border-[var(--border-subtle)] rounded-md">
+                <div className="w-14 h-14 flex items-center justify-center bg-[rgba(99,102,241,0.1)] border border-[var(--border-subtle)] rounded-full text-text-muted mb-3">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-7 h-7">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <p className="text-sm text-text-secondary mb-4">
+                  You&apos;re browsing as a guest
+                </p>
+                <button
+                  onClick={handleSignIn}
+                  className="flex items-center justify-center gap-2 px-6 py-2.5 bg-accent-primary border-none rounded-sm text-white text-sm font-medium cursor-pointer transition-all duration-fast hover:bg-accent-secondary hover:-translate-y-px"
+                >
+                  Sign in
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Desktop Background Section */}

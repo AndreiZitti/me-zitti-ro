@@ -84,7 +84,7 @@
     </div>
 
     <!-- Modal Overlay -->
-    <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="modal-container" id="modal-container">
             <button class="modal-close" id="modal-close" aria-label="Close">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -92,7 +92,7 @@
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </button>
-            <iframe id="modal-iframe" src="" title="App content"></iframe>
+            <iframe id="modal-iframe" src="" title="App content" loading="lazy"></iframe>
         </div>
     </div>
 

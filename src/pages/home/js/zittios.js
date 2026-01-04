@@ -63,20 +63,32 @@ class ModalManager {
         this.iframe.src = url;
         this.activeApp = appName;
         this.overlay.classList.add('active');
+        this.overlay.setAttribute('aria-hidden', 'false');
+        this.container.classList.add('loading');
         document.body.style.overflow = 'hidden';
+
+        // Remove loading state when iframe loads
+        this.iframe.onload = () => {
+            this.container.classList.remove('loading');
+        };
 
         // Update dock active state
         this.updateDockState(appName, true);
+
+        // Focus the close button for accessibility
+        setTimeout(() => this.closeBtn?.focus(), 100);
     }
 
     close() {
         this.overlay.classList.remove('active');
+        this.overlay.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
 
         // Clear iframe after animation
         setTimeout(() => {
             if (!this.isOpen()) {
                 this.iframe.src = '';
+                this.container.classList.remove('loading');
             }
         }, 300);
 

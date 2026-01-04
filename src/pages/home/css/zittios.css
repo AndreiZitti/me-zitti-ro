@@ -316,3 +316,80 @@ body {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ========================================
+   Focus States (Accessibility)
+   ======================================== */
+
+.dock-item:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
+.modal-close:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
+/* ========================================
+   Loading State
+   ======================================== */
+
+.modal-container.loading #modal-iframe {
+    opacity: 0;
+}
+
+.modal-container.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 32px;
+    height: 32px;
+    margin: -16px 0 0 -16px;
+    border: 2px solid var(--border-subtle);
+    border-top-color: var(--accent-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   Entrance Animation
+   ======================================== */
+
+.desktop {
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards;
+    animation-delay: 0.2s;
+}
+
+.dock {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+    animation: slideUp 0.5s ease forwards;
+    animation-delay: 0.4s;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .desktop,
+    .dock {
+        opacity: 1;
+        animation: none;
+        transform: translateX(-50%);
+    }
+}

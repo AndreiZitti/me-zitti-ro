@@ -46,7 +46,7 @@ export default function LoginPage() {
               <span className="text-2xl text-white">&#10022;</span>
             </div>
             <h1 className="text-2xl font-bold text-text-primary">Welcome back</h1>
-            <p className="text-text-secondary mt-2">Sign in to ZittiOS</p>
+            <p className="text-text-secondary mt-2">Log in to Zitti.ro</p>
           </div>
 
           {/* Form */}

@@ -15,6 +15,7 @@ export default function Home() {
   const [modalUrl, setModalUrl] = useState('');
   const [profileOpen, setProfileOpen] = useState(false);
   const [layout, setLayout] = useState<'constellation' | 'grid'>('constellation');
+  const [iconStyle, setIconStyle] = useState<'minimal' | 'colorful' | 'animated'>('minimal');
 
   useEffect(() => {
     const today = new Date().toDateString();
@@ -25,16 +26,27 @@ export default function Home() {
     const savedLayout = localStorage.getItem('zittihub-layout') as 'constellation' | 'grid' || 'constellation';
     setLayout(savedLayout);
 
+    // Load icon style preference
+    const savedIconStyle = localStorage.getItem('zittihub-icon-style') as 'minimal' | 'colorful' | 'animated' || 'minimal';
+    setIconStyle(savedIconStyle);
+
     // Listen for layout changes from ProfilePanel
     const handleLayoutChange = (e: CustomEvent) => setLayout(e.detail);
     window.addEventListener('layout-change', handleLayoutChange as EventListener);
+
+    // Listen for icon style changes from ProfilePanel
+    const handleIconStyleChange = (e: CustomEvent) => setIconStyle(e.detail);
+    window.addEventListener('icon-style-change', handleIconStyleChange as EventListener);
 
     // Respect reduced motion
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       document.documentElement.classList.add('reduced-motion');
     }
 
-    return () => window.removeEventListener('layout-change', handleLayoutChange as EventListener);
+    return () => {
+      window.removeEventListener('layout-change', handleLayoutChange as EventListener);
+      window.removeEventListener('icon-style-change', handleIconStyleChange as EventListener);
+    };
   }, []);
 
   const handleOpenModal = (url: string) => {
@@ -76,6 +88,7 @@ export default function Home() {
             onOpenModal={handleOpenModal}
             onOpenProfile={() => setProfileOpen(true)}
             layout={layout}
+            iconStyle={iconStyle}
           />
         </div>
       </div>

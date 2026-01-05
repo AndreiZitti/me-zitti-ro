@@ -12,13 +12,112 @@ interface DesktopIconData {
   internal?: string;
   external?: string;
   action?: string;
+  className?: string;
+  extraElements?: ReactNode;
 }
 
 interface DesktopIconsProps {
   onOpenModal: (url: string) => void;
   onOpenProfile: () => void;
   layout?: 'constellation' | 'grid';
+  iconStyle?: 'minimal' | 'colorful' | 'animated';
 }
+
+// Animated GIF icon paths - place your GIFs in /public/icons/animated/
+// Expected filenames: now.gif, cosmos.gif, stargazing.gif, library.gif, games.gif, travel.gif, projects.gif, profile.gif
+const animatedIcons: Record<string, string> = {
+  now: '/icons/animated/now.gif',
+  cosmos: '/icons/animated/cosmos.gif',
+  stargazing: '/icons/animated/stargazing.gif',
+  library: '/icons/animated/library.gif',
+  games: '/icons/animated/games.gif',
+  travel: '/icons/animated/travel.gif',
+  projects: '/icons/animated/projects.gif',
+  profile: '/icons/animated/profile.gif',
+};
+
+// Colorful icon configurations with gradients
+const colorfulIcons: Record<string, { gradient: string; icon: ReactNode }> = {
+  now: {
+    gradient: 'from-indigo-500 to-purple-600',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+        <circle cx="12" cy="12" r="9" />
+        <polyline points="12 7 12 12 15 14" />
+      </svg>
+    ),
+  },
+  cosmos: {
+    gradient: 'from-violet-600 to-indigo-800',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+        <circle cx="12" cy="12" r="9" />
+        <circle cx="12" cy="12" r="3" fill="white" fillOpacity="0.3" />
+        <circle cx="12" cy="5" r="1" fill="white" />
+        <circle cx="17" cy="9" r="0.75" fill="white" />
+        <circle cx="7" cy="15" r="0.75" fill="white" />
+      </svg>
+    ),
+  },
+  stargazing: {
+    gradient: 'from-amber-400 to-orange-500',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="1">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+      </svg>
+    ),
+  },
+  library: {
+    gradient: 'from-emerald-500 to-teal-600',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" fill="white" fillOpacity="0.2" />
+        <line x1="9" y1="7" x2="15" y2="7" />
+        <line x1="9" y1="11" x2="13" y2="11" />
+      </svg>
+    ),
+  },
+  games: {
+    gradient: 'from-rose-500 to-pink-600',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+        <rect x="2" y="6" width="20" height="12" rx="3" fill="white" fillOpacity="0.2" />
+        <circle cx="8" cy="12" r="2" />
+        <circle cx="16" cy="10" r="1.25" fill="white" />
+        <circle cx="16" cy="14" r="1.25" fill="white" />
+      </svg>
+    ),
+  },
+  travel: {
+    gradient: 'from-sky-400 to-blue-600',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+        <circle cx="12" cy="12" r="9" fill="white" fillOpacity="0.15" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <path d="M12 3a13 13 0 0 1 3.5 9 13 13 0 0 1-3.5 9 13 13 0 0 1-3.5-9 13 13 0 0 1 3.5-9z" />
+      </svg>
+    ),
+  },
+  projects: {
+    gradient: 'from-slate-600 to-slate-800',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+        <polyline points="4 17 10 11 4 5" />
+        <line x1="12" y1="19" x2="20" y2="19" />
+      </svg>
+    ),
+  },
+  profile: {
+    gradient: 'from-cyan-500 to-blue-500',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+        <circle cx="12" cy="8" r="4" fill="white" fillOpacity="0.3" />
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" fill="white" fillOpacity="0.2" />
+      </svg>
+    ),
+  },
+};
 
 const icons: DesktopIconData[] = [
   {
@@ -28,10 +127,13 @@ const icons: DesktopIconData[] = [
     internal: '/now',
     x: '82%',
     y: '18%',
+    className: 'icon-clock',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <circle cx="12" cy="12" r="10" />
-        <polyline points="12 6 12 12 16 14" />
+        <g className="clock-hands">
+          <polyline points="12 6 12 12 16 14" />
+        </g>
       </svg>
     ),
   },
@@ -42,10 +144,12 @@ const icons: DesktopIconData[] = [
     internal: '/pages/star-map/index.html',
     x: '88%',
     y: '28%',
+    className: 'icon-cosmos',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <circle cx="12" cy="12" r="10" />
-        <circle cx="12" cy="12" r="4" />
+        <circle className="radar-ring" cx="12" cy="12" r="4" />
+        <circle className="radar-ring" cx="12" cy="12" r="4" />
         <line x1="12" y1="2" x2="12" y2="4" />
         <line x1="12" y1="20" x2="12" y2="22" />
         <line x1="2" y1="12" x2="4" y2="12" />
@@ -60,6 +164,7 @@ const icons: DesktopIconData[] = [
     external: 'https://astro.zitti.ro',
     x: '80%',
     y: '40%',
+    className: 'icon-star',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -73,10 +178,11 @@ const icons: DesktopIconData[] = [
     internal: '/pages/book-library/index.html',
     x: '90%',
     y: '52%',
+    className: 'icon-library',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+        <path className="book-cover" d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
       </svg>
     ),
   },
@@ -87,12 +193,13 @@ const icons: DesktopIconData[] = [
     external: 'https://games.zitti.ro',
     x: '78%',
     y: '62%',
+    className: 'icon-games',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <rect x="2" y="4" width="20" height="16" rx="2" />
-        <circle cx="8" cy="12" r="2" />
-        <circle cx="16" cy="10" r="1" />
-        <circle cx="16" cy="14" r="1" />
+        <circle className="game-dpad" cx="8" cy="12" r="2" />
+        <circle className="game-btn-1" cx="16" cy="10" r="1" />
+        <circle className="game-btn-2" cx="16" cy="14" r="1" />
       </svg>
     ),
   },
@@ -103,6 +210,7 @@ const icons: DesktopIconData[] = [
     external: 'https://travelling.zitti.ro',
     x: '88%',
     y: '72%',
+    className: 'icon-travel',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <circle cx="12" cy="12" r="10" />
@@ -110,6 +218,7 @@ const icons: DesktopIconData[] = [
         <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
       </svg>
     ),
+    extraElements: <div className="travel-dot" />,
   },
   {
     id: 'projects',
@@ -118,10 +227,11 @@ const icons: DesktopIconData[] = [
     external: 'https://projects.zitti.ro',
     x: '80%',
     y: '82%',
+    className: 'icon-terminal',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <polyline points="4 17 10 11 4 5" />
-        <line x1="12" y1="19" x2="20" y2="19" />
+        <polyline className="terminal-chevron" points="4 17 10 11 4 5" />
+        <line className="terminal-cursor" x1="12" y1="19" x2="20" y2="19" />
       </svg>
     ),
   },
@@ -132,10 +242,11 @@ const icons: DesktopIconData[] = [
     action: 'openProfile',
     x: '90%',
     y: '92%',
+    className: 'icon-profile',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-        <circle cx="12" cy="7" r="4" />
+        <path className="avatar-body" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle className="avatar-head" cx="12" cy="7" r="4" />
       </svg>
     ),
   },
@@ -154,7 +265,7 @@ const getGridPosition = (index: number) => {
   };
 };
 
-export default function DesktopIcons({ onOpenModal, onOpenProfile, layout = 'constellation' }: DesktopIconsProps) {
+export default function DesktopIcons({ onOpenModal, onOpenProfile, layout = 'constellation', iconStyle = 'minimal' }: DesktopIconsProps) {
   const [isBooted, setIsBooted] = useState(false);
   const [hintText, setHintText] = useState('');
   const [showHint, setShowHint] = useState(false);
@@ -200,7 +311,9 @@ export default function DesktopIcons({ onOpenModal, onOpenProfile, layout = 'con
         {icons.map((icon, index) => (
           <button
             key={icon.id}
-            className={`flex flex-col items-center gap-2 p-3.5 bg-transparent border-none rounded-lg cursor-pointer transition-all duration-200 opacity-0 hover:scale-[1.08] hover:bg-[rgba(99,102,241,0.1)] hover:[box-shadow:0_0_20px_rgba(99,102,241,0.4)] hover:text-accent-primary active:scale-95 ${
+            className={`desktop-icon flex flex-col items-center gap-2 p-3.5 bg-transparent border-none rounded-lg cursor-pointer transition-all duration-200 opacity-0 hover:scale-[1.08] hover:bg-[rgba(99,102,241,0.1)] hover:[box-shadow:0_0_20px_rgba(99,102,241,0.4)] hover:text-accent-primary active:scale-95 ${
+              icon.className || ''
+            } ${
               isMobile
                 ? 'relative w-full min-h-[100px] border border-[rgba(148,163,184,0.1)]'
                 : 'absolute -translate-x-1/2 -translate-y-1/2 w-[100px] pointer-events-auto'
@@ -223,9 +336,34 @@ export default function DesktopIcons({ onOpenModal, onOpenProfile, layout = 'con
             }}
             onMouseLeave={() => setShowHint(false)}
           >
-            <div className="w-14 h-14 flex items-center justify-center bg-transparent border-none rounded-lg text-text-secondary transition-all duration-200">
-              <div className="w-8 h-8">{icon.icon}</div>
-            </div>
+            {iconStyle === 'animated' && animatedIcons[icon.id] ? (
+              <div className="icon-wrapper icon-animated relative w-14 h-14 flex items-center justify-center rounded-xl overflow-hidden transition-all duration-200">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={animatedIcons[icon.id]}
+                  alt={icon.label}
+                  className="w-12 h-12 object-contain"
+                  onError={(e) => {
+                    // Fallback to colorful icon if GIF not found
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                  }}
+                />
+                {/* Fallback colorful icon (hidden by default) */}
+                <div className={`hidden w-12 h-12 rounded-xl bg-gradient-to-br ${colorfulIcons[icon.id]?.gradient || 'from-gray-500 to-gray-600'} flex items-center justify-center`}>
+                  <div className="w-6 h-6">{colorfulIcons[icon.id]?.icon || icon.icon}</div>
+                </div>
+              </div>
+            ) : iconStyle === 'colorful' && colorfulIcons[icon.id] ? (
+              <div className={`icon-wrapper relative w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-br ${colorfulIcons[icon.id].gradient} shadow-lg transition-all duration-200`}>
+                <div className="w-6 h-6">{colorfulIcons[icon.id].icon}</div>
+              </div>
+            ) : (
+              <div className={`icon-wrapper relative w-14 h-14 flex items-center justify-center bg-transparent border-none rounded-lg text-text-secondary transition-all duration-200 ${icon.className || ''}`}>
+                <div className="w-8 h-8">{icon.icon}</div>
+                {icon.extraElements}
+              </div>
+            )}
             <span className="text-xs font-medium text-text-secondary shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
               {icon.label}
             </span>

@@ -185,3 +185,203 @@ a:focus-visible {
     text-wrap: balance;
   }
 }
+
+/* ===== Icon Hover Effects (Prototype) ===== */
+
+/* Effect 1: Clock hands rotation (Now icon) */
+@keyframes clockTick {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.icon-clock:hover .clock-hands {
+  transform-origin: 12px 12px;
+  animation: clockTick 2s linear infinite;
+}
+
+/* Effect 2: Star rotation + glow (Stargazing icon) */
+@keyframes starRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes starGlow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.6)); }
+  50% { filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.9)); }
+}
+
+.icon-star:hover svg {
+  animation: starRotate 8s linear infinite, starGlow 2s ease-in-out infinite;
+}
+
+/* Effect 3: Cosmos radar pulse (Cosmos icon) */
+@keyframes radarPulse {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+.icon-cosmos:hover .radar-ring {
+  animation: radarPulse 2s ease-out infinite;
+  transform-origin: center;
+}
+
+.icon-cosmos:hover .radar-ring:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+/* Effect 4: Book opens (Library icon) */
+@keyframes bookOpen {
+  0%, 100% {
+    transform: perspective(100px) rotateY(0deg);
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  50% {
+    transform: perspective(100px) rotateY(-25deg);
+    filter: drop-shadow(2px 0 8px rgba(99, 102, 241, 0.6));
+  }
+}
+
+.icon-library:hover .book-cover {
+  animation: bookOpen 2s ease-in-out infinite;
+  transform-origin: left center;
+}
+
+/* Effect 5: Game controller wiggle (Games icon) */
+@keyframes controllerWiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-8deg); }
+  75% { transform: rotate(8deg); }
+}
+
+@keyframes buttonMash {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.7); }
+}
+
+.icon-games:hover svg {
+  animation: controllerWiggle 0.5s ease-in-out infinite;
+}
+
+.icon-games:hover .game-btn-1 {
+  animation: buttonMash 0.3s ease-in-out infinite;
+}
+
+.icon-games:hover .game-btn-2 {
+  animation: buttonMash 0.3s ease-in-out infinite 0.15s;
+}
+
+/* Effect 6: Globe with traveling dot (Travel icon) */
+@keyframes travelDot {
+  0% {
+    offset-distance: 0%;
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes globePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.icon-travel:hover svg {
+  animation: globePulse 3s ease-in-out infinite;
+}
+
+.icon-travel .travel-dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--accent-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--accent-primary);
+  opacity: 0;
+  top: 50%;
+  left: 10%;
+}
+
+@keyframes dotTravel {
+  0% { left: 10%; opacity: 1; }
+  100% { left: 85%; opacity: 1; }
+}
+
+.icon-travel:hover .travel-dot {
+  animation: dotTravel 2s linear infinite;
+}
+
+/* Effect 7: Terminal typing (Projects icon) */
+@keyframes cursorBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+@keyframes chevronBounce {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
+
+.icon-terminal:hover .terminal-cursor {
+  animation: cursorBlink 1s step-end infinite;
+}
+
+.icon-terminal:hover .terminal-chevron {
+  animation: chevronBounce 0.6s ease-in-out infinite;
+}
+
+/* Effect 8: Profile breathing (Profile icon) */
+@keyframes avatarBreath {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes avatarWave {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-1px); }
+  75% { transform: translateY(1px); }
+}
+
+.icon-profile:hover .avatar-head {
+  animation: avatarBreath 2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.icon-profile:hover .avatar-body {
+  animation: avatarWave 1.5s ease-in-out infinite;
+}
+
+/* Shared hover glow for minimal icons */
+.desktop-icon:hover .icon-wrapper:not(.rounded-xl) {
+  filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));
+}
+
+/* Colorful icons hover effects */
+.desktop-icon:hover .icon-wrapper.rounded-xl {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+@keyframes colorfulBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.desktop-icon:hover .icon-wrapper.rounded-xl svg {
+  animation: colorfulBounce 0.6s ease-in-out;
+}
+
+/* Animated GIF icons hover effects */
+.desktop-icon:hover .icon-wrapper.icon-animated {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.6));
+}
+
+.desktop-icon .icon-wrapper.icon-animated img {
+  transition: transform 0.2s ease;
+}
+
+.desktop-icon:hover .icon-wrapper.icon-animated img {
+  transform: scale(1.05);
+}

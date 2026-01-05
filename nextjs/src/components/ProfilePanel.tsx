@@ -12,6 +12,7 @@ interface ProfilePanelProps {
 export default function ProfilePanel({ isOpen, onClose }: ProfilePanelProps) {
   const [selectedBackground, setSelectedBackground] = useState('starfield');
   const [selectedLayout, setSelectedLayout] = useState<'constellation' | 'grid'>('constellation');
+  const [selectedIconStyle, setSelectedIconStyle] = useState<'minimal' | 'colorful' | 'animated'>('minimal');
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const { user, loading, supabase } = useAuth();
@@ -24,6 +25,9 @@ export default function ProfilePanel({ isOpen, onClose }: ProfilePanelProps) {
 
     const savedLayout = localStorage.getItem('zittihub-layout') as 'constellation' | 'grid' || 'constellation';
     setSelectedLayout(savedLayout);
+
+    const savedIconStyle = localStorage.getItem('zittihub-icon-style') as 'minimal' | 'colorful' | 'animated' || 'minimal';
+    setSelectedIconStyle(savedIconStyle);
   }, []);
 
   useEffect(() => {
@@ -66,6 +70,12 @@ export default function ProfilePanel({ isOpen, onClose }: ProfilePanelProps) {
     setSelectedLayout(layout);
     localStorage.setItem('zittihub-layout', layout);
     window.dispatchEvent(new CustomEvent('layout-change', { detail: layout }));
+  };
+
+  const handleIconStyleChange = (style: 'minimal' | 'colorful' | 'animated') => {
+    setSelectedIconStyle(style);
+    localStorage.setItem('zittihub-icon-style', style);
+    window.dispatchEvent(new CustomEvent('icon-style-change', { detail: style }));
   };
 
   const handleSignIn = () => {
@@ -291,6 +301,88 @@ export default function ProfilePanel({ isOpen, onClose }: ProfilePanelProps) {
                   }`}
                 >
                   Grid
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Icon Style Section */}
+          <div className="mt-6">
+            <h3 className="text-xs font-medium uppercase tracking-wider text-text-muted mb-3">
+              Icon Style
+            </h3>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                className={`flex flex-col items-center gap-2 p-2 bg-transparent border-2 rounded-md cursor-pointer transition-all duration-fast ${
+                  selectedIconStyle === 'minimal'
+                    ? 'border-accent-primary bg-[rgba(99,102,241,0.1)]'
+                    : 'border-[var(--border-subtle)] hover:border-[var(--border-hover)]'
+                }`}
+                onClick={() => handleIconStyleChange('minimal')}
+              >
+                <div className="w-full aspect-square rounded-sm overflow-hidden bg-[#0a0f1a] relative flex items-center justify-center">
+                  <div className="w-8 h-8 border border-text-muted rounded-sm flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-text-muted">
+                      <circle cx="12" cy="12" r="10" />
+                    </svg>
+                  </div>
+                </div>
+                <span
+                  className={`text-[10px] font-medium ${
+                    selectedIconStyle === 'minimal' ? 'text-text-primary' : 'text-text-secondary'
+                  }`}
+                >
+                  Minimal
+                </span>
+              </button>
+
+              <button
+                className={`flex flex-col items-center gap-2 p-2 bg-transparent border-2 rounded-md cursor-pointer transition-all duration-fast ${
+                  selectedIconStyle === 'colorful'
+                    ? 'border-accent-primary bg-[rgba(99,102,241,0.1)]'
+                    : 'border-[var(--border-subtle)] hover:border-[var(--border-hover)]'
+                }`}
+                onClick={() => handleIconStyleChange('colorful')}
+              >
+                <div className="w-full aspect-square rounded-sm overflow-hidden bg-[#0a0f1a] relative flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="w-4 h-4">
+                      <circle cx="12" cy="12" r="10" />
+                    </svg>
+                  </div>
+                </div>
+                <span
+                  className={`text-[10px] font-medium ${
+                    selectedIconStyle === 'colorful' ? 'text-text-primary' : 'text-text-secondary'
+                  }`}
+                >
+                  Colorful
+                </span>
+              </button>
+
+              <button
+                className={`flex flex-col items-center gap-2 p-2 bg-transparent border-2 rounded-md cursor-pointer transition-all duration-fast ${
+                  selectedIconStyle === 'animated'
+                    ? 'border-accent-primary bg-[rgba(99,102,241,0.1)]'
+                    : 'border-[var(--border-subtle)] hover:border-[var(--border-hover)]'
+                }`}
+                onClick={() => handleIconStyleChange('animated')}
+              >
+                <div className="w-full aspect-square rounded-sm overflow-hidden bg-[#0a0f1a] relative flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center relative overflow-hidden">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="w-4 h-4">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                    {/* Animated shimmer effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+                  </div>
+                </div>
+                <span
+                  className={`text-[10px] font-medium ${
+                    selectedIconStyle === 'animated' ? 'text-text-primary' : 'text-text-secondary'
+                  }`}
+                >
+                  Animated
                 </span>
               </button>
             </div>

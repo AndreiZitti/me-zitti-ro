@@ -224,10 +224,17 @@ export class StarField {
 
       this.ctx.strokeStyle = gradient;
       this.ctx.lineWidth = 2;
+      this.ctx.lineCap = 'round';
       this.ctx.beginPath();
       this.ctx.moveTo(star.x, star.y);
       this.ctx.lineTo(endX, endY);
       this.ctx.stroke();
+
+      // Draw a bright head without expensive shadowBlur
+      this.ctx.beginPath();
+      this.ctx.arc(star.x, star.y, 2, 0, Math.PI * 2);
+      this.ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+      this.ctx.fill();
     });
   }
 
@@ -366,7 +373,7 @@ export class StarField {
       this.drawPathWithProgress(c.path, px, py, c.scale, this.lineProgress, c.lineOpacity);
     }
 
-    // Draw stars
+    // Draw stars - without shadowBlur for performance
     c.stars.forEach(([nx, ny], i) => {
       const starX = px + nx * c.scale;
       const starY = py + ny * c.scale;
@@ -379,10 +386,7 @@ export class StarField {
       ctx.beginPath();
       ctx.arc(starX, starY, size, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 255, 255, ${finalOpacity})`;
-      ctx.shadowBlur = 6;
-      ctx.shadowColor = `rgba(255, 255, 255, ${finalOpacity * 0.8})`;
       ctx.fill();
-      ctx.shadowBlur = 0;
     });
   }
 
@@ -429,15 +433,24 @@ export class StarField {
     // Draw constellations behind regular stars
     this.drawConstellations(this.mouseX || 0, this.mouseY || 0);
 
-    this.stars.forEach(star => {
+    // Draw stars with performant glow (no shadowBlur)
+    for (let i = 0; i < this.stars.length; i++) {
+      const star = this.stars[i];
+
+      // Draw glow (larger, faded circle behind)
+      this.ctx.globalAlpha = star.opacity * 0.3;
+      this.ctx.fillStyle = '#fff';
+      this.ctx.beginPath();
+      this.ctx.arc(star.x, star.y, star.size * 2.5, 0, Math.PI * 2);
+      this.ctx.fill();
+
+      // Draw bright core
+      this.ctx.globalAlpha = star.opacity;
       this.ctx.beginPath();
       this.ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-      this.ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
-      this.ctx.shadowBlur = star.size * 1.5;
-      this.ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
       this.ctx.fill();
-      this.ctx.shadowBlur = 0;
-    });
+    }
+    this.ctx.globalAlpha = 1;
 
     this.drawShootingStars();
   }

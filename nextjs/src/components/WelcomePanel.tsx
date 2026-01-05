@@ -13,7 +13,7 @@ export default function WelcomePanel() {
 
   return (
     <div
-      className="absolute top-1/2 left-12 -translate-y-1/2 max-w-[320px] z-[1] opacity-0"
+      className="relative px-6 py-8 max-w-[320px] z-[1] opacity-0 mx-auto text-center lg:absolute lg:top-1/2 lg:left-12 lg:-translate-y-1/2 lg:mx-0 lg:text-left lg:px-0 lg:py-0"
       style={{
         animation: `welcomeFadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards`,
         animationDelay: isBooted ? '0.1s' : '1.15s',
@@ -46,7 +46,7 @@ export default function WelcomePanel() {
       </a>
 
       {/* Social Links */}
-      <div className="flex gap-3 mt-6">
+      <div className="flex gap-3 mt-6 justify-center lg:justify-start">
         <a
           href="https://www.linkedin.com/in/zitti"
           target="_blank"

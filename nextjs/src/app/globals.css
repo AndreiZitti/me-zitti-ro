@@ -37,7 +37,13 @@
 
 html, body {
   height: 100%;
-  overflow: hidden;
+}
+
+/* Only hide overflow on desktop - allow scroll on mobile */
+@media (min-width: 1024px) {
+  html, body {
+    overflow: hidden;
+  }
 }
 
 body {
@@ -74,14 +80,29 @@ body.bg-aurora::before {
   to { opacity: 1; }
 }
 
+/* Mobile: simple fade in */
 @keyframes welcomeFadeIn {
   from {
     opacity: 0;
-    transform: translateY(-50%) translateX(-20px);
+    transform: translateX(-20px);
   }
   to {
     opacity: 1;
-    transform: translateY(-50%) translateX(0);
+    transform: translateX(0);
+  }
+}
+
+/* Desktop: fade in with vertical centering */
+@media (min-width: 1024px) {
+  @keyframes welcomeFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-50%) translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
   }
 }
 
@@ -96,6 +117,17 @@ body.bg-aurora::before {
     transform: translate(-50%, -50%) translateY(0) scale(1);
     filter: blur(0);
   }
+}
+
+@keyframes iconGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.4); }
+  50% { box-shadow: 0 0 25px rgba(99, 102, 241, 0.5); }
+}
+
+@keyframes tapPulse {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(0.95); }
+  100% { transform: translate(-50%, -50%) scale(1); }
 }
 
 @keyframes dotToLine {

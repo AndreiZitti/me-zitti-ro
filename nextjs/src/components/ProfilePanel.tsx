@@ -11,15 +11,19 @@ interface ProfilePanelProps {
 
 export default function ProfilePanel({ isOpen, onClose }: ProfilePanelProps) {
   const [selectedBackground, setSelectedBackground] = useState('starfield');
+  const [selectedLayout, setSelectedLayout] = useState<'constellation' | 'grid'>('constellation');
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const { user, loading, supabase } = useAuth();
 
   useEffect(() => {
-    // Load saved background preference
-    const saved = localStorage.getItem('zittihub-background') || 'starfield';
-    setSelectedBackground(saved);
-    applyBackground(saved);
+    // Load saved preferences
+    const savedBg = localStorage.getItem('zittihub-background') || 'starfield';
+    setSelectedBackground(savedBg);
+    applyBackground(savedBg);
+
+    const savedLayout = localStorage.getItem('zittihub-layout') as 'constellation' | 'grid' || 'constellation';
+    setSelectedLayout(savedLayout);
   }, []);
 
   useEffect(() => {
@@ -56,6 +60,12 @@ export default function ProfilePanel({ isOpen, onClose }: ProfilePanelProps) {
     setSelectedBackground(bg);
     applyBackground(bg);
     localStorage.setItem('zittihub-background', bg);
+  };
+
+  const handleLayoutChange = (layout: 'constellation' | 'grid') => {
+    setSelectedLayout(layout);
+    localStorage.setItem('zittihub-layout', layout);
+    window.dispatchEvent(new CustomEvent('layout-change', { detail: layout }));
   };
 
   const handleSignIn = () => {
@@ -220,6 +230,67 @@ export default function ProfilePanel({ isOpen, onClose }: ProfilePanelProps) {
                   }`}
                 >
                   Aurora
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop Layout Section */}
+          <div className="mt-6">
+            <h3 className="text-xs font-medium uppercase tracking-wider text-text-muted mb-3">
+              Desktop Layout
+            </h3>
+            <p className="text-xs text-text-muted mb-3">
+              Only affects desktop view
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                className={`flex flex-col items-center gap-2 p-3 bg-transparent border-2 rounded-md cursor-pointer transition-all duration-fast ${
+                  selectedLayout === 'constellation'
+                    ? 'border-accent-primary bg-[rgba(99,102,241,0.1)]'
+                    : 'border-[var(--border-subtle)] hover:border-[var(--border-hover)]'
+                }`}
+                onClick={() => handleLayoutChange('constellation')}
+              >
+                <div className="w-full aspect-video rounded-sm overflow-hidden bg-[#0a0f1a] relative">
+                  {/* Scattered dots preview */}
+                  <div className="absolute w-1.5 h-1.5 bg-text-muted rounded-full" style={{ top: '20%', left: '60%' }} />
+                  <div className="absolute w-1.5 h-1.5 bg-text-muted rounded-full" style={{ top: '40%', left: '80%' }} />
+                  <div className="absolute w-1.5 h-1.5 bg-text-muted rounded-full" style={{ top: '60%', left: '65%' }} />
+                  <div className="absolute w-1.5 h-1.5 bg-text-muted rounded-full" style={{ top: '80%', left: '75%' }} />
+                </div>
+                <span
+                  className={`text-xs font-medium ${
+                    selectedLayout === 'constellation' ? 'text-text-primary' : 'text-text-secondary'
+                  }`}
+                >
+                  Constellation
+                </span>
+              </button>
+
+              <button
+                className={`flex flex-col items-center gap-2 p-3 bg-transparent border-2 rounded-md cursor-pointer transition-all duration-fast ${
+                  selectedLayout === 'grid'
+                    ? 'border-accent-primary bg-[rgba(99,102,241,0.1)]'
+                    : 'border-[var(--border-subtle)] hover:border-[var(--border-hover)]'
+                }`}
+                onClick={() => handleLayoutChange('grid')}
+              >
+                <div className="w-full aspect-video rounded-sm overflow-hidden bg-[#0a0f1a] relative">
+                  {/* Grid dots preview */}
+                  <div className="absolute w-1.5 h-1.5 bg-text-muted rounded-full" style={{ top: '25%', left: '60%' }} />
+                  <div className="absolute w-1.5 h-1.5 bg-text-muted rounded-full" style={{ top: '25%', left: '80%' }} />
+                  <div className="absolute w-1.5 h-1.5 bg-text-muted rounded-full" style={{ top: '50%', left: '60%' }} />
+                  <div className="absolute w-1.5 h-1.5 bg-text-muted rounded-full" style={{ top: '50%', left: '80%' }} />
+                  <div className="absolute w-1.5 h-1.5 bg-text-muted rounded-full" style={{ top: '75%', left: '60%' }} />
+                  <div className="absolute w-1.5 h-1.5 bg-text-muted rounded-full" style={{ top: '75%', left: '80%' }} />
+                </div>
+                <span
+                  className={`text-xs font-medium ${
+                    selectedLayout === 'grid' ? 'text-text-primary' : 'text-text-secondary'
+                  }`}
+                >
+                  Grid
                 </span>
               </button>
             </div>

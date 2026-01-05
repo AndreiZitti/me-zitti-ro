@@ -17,6 +17,7 @@ interface DesktopIconData {
 interface DesktopIconsProps {
   onOpenModal: (url: string) => void;
   onOpenProfile: () => void;
+  layout?: 'constellation' | 'grid';
 }
 
 const icons: DesktopIconData[] = [
@@ -143,10 +144,28 @@ const icons: DesktopIconData[] = [
 // Apps that open full screen instead of in modal
 const fullScreenApps = ['now', 'cosmos'];
 
-export default function DesktopIcons({ onOpenModal, onOpenProfile }: DesktopIconsProps) {
+// Grid positions for 2x4 layout
+const getGridPosition = (index: number) => {
+  const col = index % 2;
+  const row = Math.floor(index / 2);
+  return {
+    x: col === 0 ? '75%' : '90%',
+    y: `${18 + row * 20}%`,
+  };
+};
+
+export default function DesktopIcons({ onOpenModal, onOpenProfile, layout = 'constellation' }: DesktopIconsProps) {
   const [isBooted, setIsBooted] = useState(false);
   const [hintText, setHintText] = useState('');
   const [showHint, setShowHint] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const today = new Date().toDateString();
@@ -177,44 +196,60 @@ export default function DesktopIcons({ onOpenModal, onOpenProfile }: DesktopIcon
 
   return (
     <>
-      <div className="absolute inset-0 pointer-events-none z-[1]">
+      <div className={`z-[1] ${isMobile ? 'relative grid grid-cols-2 gap-4 px-6 pb-8 pt-4' : 'absolute inset-0 pointer-events-none'}`}>
         {icons.map((icon, index) => (
           <button
             key={icon.id}
-            className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2 p-3.5 bg-transparent border-none rounded-md cursor-pointer transition-all duration-fast w-[100px] pointer-events-auto opacity-0 hover:bg-white/5 active:scale-95"
-            style={{
-              left: icon.x,
-              top: icon.y,
+            className={`flex flex-col items-center gap-2 p-3.5 bg-transparent border-none rounded-lg cursor-pointer transition-all duration-200 opacity-0 hover:scale-[1.08] hover:bg-[rgba(99,102,241,0.1)] hover:[box-shadow:0_0_20px_rgba(99,102,241,0.4)] hover:text-accent-primary active:scale-95 ${
+              isMobile
+                ? 'relative w-full min-h-[100px] border border-[rgba(148,163,184,0.1)]'
+                : 'absolute -translate-x-1/2 -translate-y-1/2 w-[100px] pointer-events-auto'
+            }`}
+            style={isMobile ? {
+              animation: `fadeIn 0.4s ease forwards`,
+              animationDelay: `${0.1 + index * 0.05}s`,
+            } : {
+              left: layout === 'grid' ? getGridPosition(index).x : icon.x,
+              top: layout === 'grid' ? getGridPosition(index).y : icon.y,
               animation: `iconReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards`,
               animationDelay: getAnimationDelay(index),
             }}
             onClick={() => handleClick(icon)}
             onMouseEnter={() => {
-              setHintText(icon.hint);
-              setShowHint(true);
+              if (!isMobile) {
+                setHintText(icon.hint);
+                setShowHint(true);
+              }
             }}
             onMouseLeave={() => setShowHint(false)}
           >
-            <div className="w-14 h-14 flex items-center justify-center bg-transparent border-none rounded-lg text-text-secondary transition-all duration-fast group-hover:bg-white/[0.08] group-hover:text-accent-primary">
+            <div className="w-14 h-14 flex items-center justify-center bg-transparent border-none rounded-lg text-text-secondary transition-all duration-200">
               <div className="w-8 h-8">{icon.icon}</div>
             </div>
             <span className="text-xs font-medium text-text-secondary shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
               {icon.label}
             </span>
+            {isMobile && (
+              <span className="text-[10px] text-text-muted mt-1 line-clamp-2">
+                {icon.hint}
+              </span>
+            )}
           </button>
         ))}
       </div>
 
-      {/* Icon Hint Tooltip */}
-      <div
-        className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6 py-3 bg-[rgba(15,23,42,0.9)] backdrop-blur-[12px] border border-[var(--border-subtle)] rounded-md z-50 pointer-events-none transition-all duration-200 ${
-          showHint ? 'opacity-100 visible' : 'opacity-0 invisible'
-        }`}
-      >
-        <span className="text-[0.9375rem] text-text-secondary whitespace-nowrap">
-          {hintText}
-        </span>
-      </div>
+      {/* Icon Hint Tooltip - Desktop only */}
+      {!isMobile && (
+        <div
+          className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6 py-3 bg-[rgba(15,23,42,0.9)] backdrop-blur-[12px] border border-[var(--border-subtle)] rounded-md z-50 pointer-events-none transition-all duration-200 ${
+            showHint ? 'opacity-100 visible' : 'opacity-0 invisible'
+          }`}
+        >
+          <span className="text-[0.9375rem] text-text-secondary whitespace-nowrap">
+            {hintText}
+          </span>
+        </div>
+      )}
     </>
   );
 }

@@ -14,16 +14,27 @@ export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalUrl, setModalUrl] = useState('');
   const [profileOpen, setProfileOpen] = useState(false);
+  const [layout, setLayout] = useState<'constellation' | 'grid'>('constellation');
 
   useEffect(() => {
     const today = new Date().toDateString();
     const lastBoot = localStorage.getItem('zittihub-last-boot');
     setIsBooted(lastBoot === today);
 
+    // Load layout preference
+    const savedLayout = localStorage.getItem('zittihub-layout') as 'constellation' | 'grid' || 'constellation';
+    setLayout(savedLayout);
+
+    // Listen for layout changes from ProfilePanel
+    const handleLayoutChange = (e: CustomEvent) => setLayout(e.detail);
+    window.addEventListener('layout-change', handleLayoutChange as EventListener);
+
     // Respect reduced motion
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       document.documentElement.classList.add('reduced-motion');
     }
+
+    return () => window.removeEventListener('layout-change', handleLayoutChange as EventListener);
   }, []);
 
   const handleOpenModal = (url: string) => {
@@ -46,7 +57,7 @@ export default function Home() {
 
       {/* Desktop Container */}
       <div
-        className="relative z-[1] h-screen flex flex-col opacity-0"
+        className="relative z-[1] min-h-screen flex flex-col opacity-0 lg:h-screen lg:overflow-hidden"
         style={{
           animation: `fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards`,
           animationDelay: isBooted ? '0s' : '1s',
@@ -55,14 +66,18 @@ export default function Home() {
         {/* Top Bar */}
         <TopBar />
 
-        {/* Welcome Panel */}
-        <WelcomePanel />
+        {/* Main content area */}
+        <div className="flex-1 overflow-y-auto lg:overflow-visible">
+          {/* Welcome Panel */}
+          <WelcomePanel />
 
-        {/* Desktop Icons */}
-        <DesktopIcons
-          onOpenModal={handleOpenModal}
-          onOpenProfile={() => setProfileOpen(true)}
-        />
+          {/* Desktop Icons */}
+          <DesktopIcons
+            onOpenModal={handleOpenModal}
+            onOpenProfile={() => setProfileOpen(true)}
+            layout={layout}
+          />
+        </div>
       </div>
 
       {/* Modal for App Windows */}

@@ -35,6 +35,7 @@ const animatedIcons: Record<string, string> = {
   projects: '/icons/animated/projects.gif',
   profile: '/icons/animated/profile.gif',
   'food-tracker': '/icons/animated/food-tracker.gif',
+  'screenshot-finder': '/icons/animated/screenshot-finder.gif',
 };
 
 // Colorful icon configurations with gradients
@@ -131,6 +132,19 @@ const colorfulIcons: Record<string, { gradient: string; icon: ReactNode }> = {
       </svg>
     ),
   },
+  'screenshot-finder': {
+    gradient: 'from-fuchsia-500 to-purple-600',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+        <rect x="3" y="3" width="18" height="14" rx="2" fill="white" fillOpacity="0.2" />
+        <path d="M3 9h18" />
+        <circle cx="17" cy="17" r="3" />
+        <path d="M21 21l-2-2" />
+        <path d="M8 6h.01" />
+        <path d="M11 6h.01" />
+      </svg>
+    ),
+  },
 };
 
 const icons: DesktopIconData[] = [
@@ -201,6 +215,25 @@ const icons: DesktopIconData[] = [
         <path d="M7 6c-1 0-2 .5-2 2h4c0-1.5-1-2-2-2z" />
         <path className="knife" d="M17 3v18" />
         <path d="M17 3c2 0 3 2 3 5s-1.5 4-3 4" />
+      </svg>
+    ),
+  },
+  {
+    id: 'screenshot-finder',
+    label: 'Screenshot Sh*t',
+    hint: 'Upload screenshots, AI extracts what matters and saves it',
+    external: 'https://screenshot-finder.zitti.ro',
+    x: '72%',
+    y: '50%',
+    className: 'icon-screenshot',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="3" y="3" width="18" height="14" rx="2" />
+        <path d="M3 9h18" />
+        <circle cx="17" cy="17" r="3" />
+        <path d="M21 21l-2-2" />
+        <path d="M8 6h.01" />
+        <path d="M11 6h.01" />
       </svg>
     ),
   },
@@ -288,10 +321,23 @@ const icons: DesktopIconData[] = [
 // Apps that open full screen instead of in modal
 const fullScreenApps = ['now', 'cosmos'];
 
-// Grid positions for 2x4 layout
-const getGridPosition = (index: number) => {
-  const col = index % 2;
-  const row = Math.floor(index / 2);
+// Grid positions - 3 columns for desktop to fit more icons
+const getGridPosition = (index: number, totalIcons: number) => {
+  // Use 3 columns if we have more than 8 icons, otherwise 2
+  const cols = totalIcons > 8 ? 3 : 2;
+  const col = index % cols;
+  const row = Math.floor(index / cols);
+
+  if (cols === 3) {
+    // 3-column layout: 68%, 80%, 92%
+    const xPositions = ['68%', '80%', '92%'];
+    return {
+      x: xPositions[col],
+      y: `${15 + row * 17}%`,
+    };
+  }
+
+  // Original 2-column layout
   return {
     x: col === 0 ? '75%' : '90%',
     y: `${18 + row * 20}%`,
@@ -355,8 +401,8 @@ export default function DesktopIcons({ onOpenModal, onOpenProfile, layout = 'con
               animation: `fadeIn 0.4s ease forwards`,
               animationDelay: `${0.1 + index * 0.05}s`,
             } : {
-              left: layout === 'grid' ? getGridPosition(index).x : icon.x,
-              top: layout === 'grid' ? getGridPosition(index).y : icon.y,
+              left: layout === 'grid' ? getGridPosition(index, icons.length).x : icon.x,
+              top: layout === 'grid' ? getGridPosition(index, icons.length).y : icon.y,
               animation: `iconReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards`,
               animationDelay: getAnimationDelay(index),
             }}

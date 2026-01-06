@@ -4,7 +4,7 @@
 
 # ZittiHub
 
-_A desktop-style portfolio with boot animation, starfield, and interactive icons_
+_A desktop-style hub connecting all my apps and side projects_
 
 ![Next.js](https://img.shields.io/badge/Next.js-black?logo=next.js&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white)
@@ -13,20 +13,25 @@ _A desktop-style portfolio with boot animation, starfield, and interactive icons
 
 </div>
 
-## How it works
+## The Ecosystem
 
-```
-┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│  Boot Anim   │ ──▶ │  Starfield   │ ──▶ │ Desktop Icons│
-└──────────────┘     └──────────────┘     └──────────────┘
-                                                  │
-                    ┌─────────────────────────────┼─────────────────────────────┐
-                    ▼                             ▼                             ▼
-              ┌──────────┐                 ┌──────────┐                 ┌──────────┐
-              │  Cosmos  │                 │  Travel  │                 │  Games   │
-              │  Library │                 │ Projects │                 │   Now    │
-              └──────────┘                 └──────────┘                 └──────────┘
-```
+This is the central hub at **[zitti.ro](https://zitti.ro)** — a desktop-style interface that links to all my projects:
+
+| App | Domain | Description |
+|-----|--------|-------------|
+| **Stargazing** | [astro.zitti.ro](https://astro.zitti.ro) | Find stargazing spots and check weather conditions |
+| **Food Tracker** | [food-tracker.zitti.ro](https://food-tracker.zitti.ro) | AI-powered nutrition tracking with label scanning |
+| **Games** | [games.zitti.ro](https://games.zitti.ro) | Play games with friends, in person or online |
+| **Travel** | [travelling.zitti.ro](https://travelling.zitti.ro) | Record and share your travels |
+| **Projects** | [projects.zitti.ro](https://projects.zitti.ro) | Full portfolio of work and experiments |
+
+### Built-in Pages
+
+| Page | Description |
+|------|-------------|
+| **Now** | What I'm currently up to |
+| **Cosmos Map** | Collection of my astronomy photographs |
+| **Library** | Books I've read |
 
 ## Tech Stack
 
@@ -74,7 +79,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 
 Check out the full collection at **[zitti.ro](https://zitti.ro)**
 
-Don't want to self-host? [Contact me](https://zitti.ro) — happy to set you up with an account.
+Don't want to self-host? [Contact me](mailto:andrei@zitti.ro) — happy to set you up with an account.
 
 ![footer](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12&height=80&section=footer)
 

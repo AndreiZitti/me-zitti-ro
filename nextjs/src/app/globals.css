@@ -352,6 +352,22 @@ a:focus-visible {
   animation: avatarWave 1.5s ease-in-out infinite;
 }
 
+/* Effect 9: Food tracker utensils (Food icon) */
+@keyframes utensilsWiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+@keyframes foodGlow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(132, 204, 22, 0.5)); }
+  50% { filter: drop-shadow(0 0 12px rgba(34, 197, 94, 0.8)); }
+}
+
+.icon-food:hover svg {
+  animation: utensilsWiggle 0.4s ease-in-out infinite, foodGlow 1.5s ease-in-out infinite;
+}
+
 /* Shared hover glow for minimal icons */
 .desktop-icon:hover .icon-wrapper:not(.rounded-xl) {
   filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));

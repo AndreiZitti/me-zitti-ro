@@ -34,6 +34,7 @@ const animatedIcons: Record<string, string> = {
   travel: '/icons/animated/travel.gif',
   projects: '/icons/animated/projects.gif',
   profile: '/icons/animated/profile.gif',
+  'food-tracker': '/icons/animated/food-tracker.gif',
 };
 
 // Colorful icon configurations with gradients
@@ -117,6 +118,19 @@ const colorfulIcons: Record<string, { gradient: string; icon: ReactNode }> = {
       </svg>
     ),
   },
+  'food-tracker': {
+    gradient: 'from-lime-500 to-green-600',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+        <path d="M7 3v5c0 1.5-1 2-1 4v9" />
+        <path d="M5 3v3" />
+        <path d="M9 3v3" />
+        <path d="M7 6c-1 0-2 .5-2 2h4c0-1.5-1-2-2-2z" fill="white" fillOpacity="0.2" />
+        <path d="M17 3v18" />
+        <path d="M17 3c2 0 3 2 3 5s-1.5 4-3 4" fill="white" fillOpacity="0.3" />
+      </svg>
+    ),
+  },
 };
 
 const icons: DesktopIconData[] = [
@@ -168,6 +182,25 @@ const icons: DesktopIconData[] = [
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+      </svg>
+    ),
+  },
+  {
+    id: 'food-tracker',
+    label: 'Food Tracker',
+    hint: 'Track nutrition and weight with AI-powered label scanning',
+    external: 'https://food-tracker.zitti.ro',
+    x: '84%',
+    y: '57%',
+    className: 'icon-food',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path className="fork" d="M7 3v5c0 1.5-1 2-1 4v9" />
+        <path d="M5 3v3" />
+        <path d="M9 3v3" />
+        <path d="M7 6c-1 0-2 .5-2 2h4c0-1.5-1-2-2-2z" />
+        <path className="knife" d="M17 3v18" />
+        <path d="M17 3c2 0 3 2 3 5s-1.5 4-3 4" />
       </svg>
     ),
   },

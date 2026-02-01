@@ -22,15 +22,32 @@ export function useAuth() {
     authInitializedRef.current = true;
 
     const initAuth = async () => {
-      const { data: { user: fetchedUser } } = await supabase.auth.getUser();
-      const userId = fetchedUser?.id ?? null;
+      try {
+        const { data: { user: fetchedUser }, error } = await supabase.auth.getUser();
 
-      // Only update if different from current
-      if (userId !== currentUserIdRef.current) {
-        currentUserIdRef.current = userId;
-        setUser(fetchedUser);
+        if (error) {
+          console.warn('Auth initialization warning:', error.message);
+          // Clear any stale tokens on auth error
+          if (error.message?.includes('Refresh Token') || error.message?.includes('session')) {
+            await supabase.auth.signOut();
+          }
+          currentUserIdRef.current = null;
+          setUser(null);
+        } else {
+          const userId = fetchedUser?.id ?? null;
+          // Only update if different from current
+          if (userId !== currentUserIdRef.current) {
+            currentUserIdRef.current = userId;
+            setUser(fetchedUser);
+          }
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        currentUserIdRef.current = null;
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     initAuth();
 

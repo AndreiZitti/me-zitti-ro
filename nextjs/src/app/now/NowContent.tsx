@@ -14,67 +14,46 @@ interface EditingState {
   id: string | 'new';
   label: string;
   text: string;
+  entryDate: string;
 }
 
-interface EntryBatch {
-  date: Date;
+interface DateGroup {
+  date: string;
   dateLabel: string;
   entries: NowEntry[];
 }
 
-function groupEntriesByWeek(entries: NowEntry[]): EntryBatch[] {
-  if (entries.length === 0) return [];
-
-  const batches: EntryBatch[] = [];
-  let currentBatch: EntryBatch | null = null;
-  let lastEntryDate: Date | null = null;
-
-  // Entries are already sorted by created_at descending
-  for (const entry of entries) {
-    const entryDate = new Date(entry.created_at);
-    
-    if (!currentBatch) {
-      // First entry starts a new batch
-      currentBatch = {
-        date: entryDate,
-        dateLabel: formatDateLabel(entryDate),
-        entries: [entry],
-      };
-      lastEntryDate = entryDate;
-    } else {
-      // Check if more than 7 days gap from PREVIOUS entry (not batch start)
-      const daysDiff = Math.abs(lastEntryDate!.getTime() - entryDate.getTime()) / (1000 * 60 * 60 * 24);
-      
-      if (daysDiff > 7) {
-        // Save current batch and start a new one
-        batches.push(currentBatch);
-        currentBatch = {
-          date: entryDate,
-          dateLabel: formatDateLabel(entryDate),
-          entries: [entry],
-        };
-      } else {
-        // Add to current batch
-        currentBatch.entries.push(entry);
-      }
-      lastEntryDate = entryDate;
-    }
-  }
-
-  // Don't forget the last batch
-  if (currentBatch) {
-    batches.push(currentBatch);
-  }
-
-  return batches;
-}
-
-function formatDateLabel(date: Date): string {
+function formatDateLabel(dateStr: string): string {
+  const date = new Date(dateStr + 'T00:00:00');
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
+}
+
+function getTodayString(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
+function groupEntriesByDate(entries: NowEntry[]): DateGroup[] {
+  const groups: DateGroup[] = [];
+  let currentGroup: DateGroup | null = null;
+
+  for (const entry of entries) {
+    if (!currentGroup || currentGroup.date !== entry.entry_date) {
+      currentGroup = {
+        date: entry.entry_date,
+        dateLabel: formatDateLabel(entry.entry_date),
+        entries: [entry],
+      };
+      groups.push(currentGroup);
+    } else {
+      currentGroup.entries.push(entry);
+    }
+  }
+
+  return groups;
 }
 
 export default function NowContent({ entries: initialEntries, canEdit }: NowContentProps) {
@@ -85,12 +64,12 @@ export default function NowContent({ entries: initialEntries, canEdit }: NowCont
   const router = useRouter();
 
   const handleEdit = (entry: NowEntry) => {
-    setEditing({ id: entry.id, label: entry.label, text: entry.text });
+    setEditing({ id: entry.id, label: entry.label, text: entry.text, entryDate: entry.entry_date });
     setError(null);
   };
 
   const handleAddNew = () => {
-    setEditing({ id: 'new', label: '', text: '' });
+    setEditing({ id: 'new', label: '', text: '', entryDate: getTodayString() });
     setError(null);
   };
 
@@ -117,6 +96,7 @@ export default function NowContent({ entries: initialEntries, canEdit }: NowCont
           id: 'temp-' + Date.now(),
           label: editing.label,
           text: editing.text,
+          entry_date: editing.entryDate,
           sort_order: 0,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -124,7 +104,7 @@ export default function NowContent({ entries: initialEntries, canEdit }: NowCont
         setEntries([tempEntry, ...entries]);
         setEditing(null);
 
-        const result = await createEntry(editing.label, editing.text);
+        const result = await createEntry(editing.label, editing.text, editing.entryDate);
         if (!result.success) {
           // Revert on error
           setEntries(entries);
@@ -135,15 +115,15 @@ export default function NowContent({ entries: initialEntries, canEdit }: NowCont
         }
       } else {
         // Optimistic update
-        const updatedEntries = entries.map(e => 
-          e.id === editing.id 
-            ? { ...e, label: editing.label, text: editing.text, updated_at: new Date().toISOString() }
+        const updatedEntries = entries.map(e =>
+          e.id === editing.id
+            ? { ...e, label: editing.label, text: editing.text, entry_date: editing.entryDate, updated_at: new Date().toISOString() }
             : e
         );
         setEntries(updatedEntries);
         setEditing(null);
 
-        const result = await updateEntry(editing.id, editing.label, editing.text);
+        const result = await updateEntry(editing.id, editing.label, editing.text, editing.entryDate);
         if (!result.success) {
           // Revert on error
           setEntries(entries);
@@ -177,8 +157,7 @@ export default function NowContent({ entries: initialEntries, canEdit }: NowCont
     }
   };
 
-  const batches = groupEntriesByWeek(entries);
-
+  
   return (
     <div className="min-h-screen bg-[var(--bg-deep)] text-[var(--text-primary)]">
       {/* Header */}
@@ -233,14 +212,22 @@ export default function NowContent({ entries: initialEntries, canEdit }: NowCont
         {/* Add new entry form at top */}
         {editing?.id === 'new' && (
           <div className="mb-8 space-y-3 p-4 bg-[var(--bg-surface)] rounded-lg border border-[var(--border-subtle)]">
-            <input
-              type="text"
-              value={editing.label}
-              onChange={(e) => setEditing({ ...editing, label: e.target.value })}
-              placeholder="Label (e.g., Working on, Reading)"
-              className="w-full px-3 py-2 bg-white/5 border border-[var(--border-subtle)] rounded text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
-              autoFocus
-            />
+            <div className="flex gap-3">
+              <input
+                type="date"
+                value={editing.entryDate}
+                onChange={(e) => setEditing({ ...editing, entryDate: e.target.value })}
+                className="px-3 py-2 bg-white/5 border border-[var(--border-subtle)] rounded text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+              />
+              <input
+                type="text"
+                value={editing.label}
+                onChange={(e) => setEditing({ ...editing, label: e.target.value })}
+                placeholder="Label (e.g., Working on, Reading)"
+                className="flex-1 px-3 py-2 bg-white/5 border border-[var(--border-subtle)] rounded text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                autoFocus
+              />
+            </div>
             <textarea
               value={editing.text}
               onChange={(e) => setEditing({ ...editing, text: e.target.value })}
@@ -267,31 +254,39 @@ export default function NowContent({ entries: initialEntries, canEdit }: NowCont
           </div>
         )}
 
-        {/* Entries grouped by date batches */}
-        <section className="space-y-12">
-          {batches.map((batch, batchIndex) => (
-            <div key={batchIndex}>
+        {/* Entries grouped by date */}
+        <section className="space-y-10">
+          {groupEntriesByDate(entries).map((group) => (
+            <div key={group.date}>
               {/* Date header */}
-              <div className="mb-6 pb-2 border-b border-[var(--border-subtle)]">
+              <div className="mb-4 pb-2 border-b border-[var(--border-subtle)]">
                 <span className="text-sm font-medium text-[var(--accent-primary)]">
-                  {batch.dateLabel}
+                  {group.dateLabel}
                 </span>
               </div>
 
-              {/* Entries in this batch */}
-              <div className="space-y-6">
-                {batch.entries.map((entry) => (
+              {/* Entries for this date */}
+              <div className="space-y-4">
+                {group.entries.map((entry) => (
                   <div key={entry.id} className="group relative">
                     {editing?.id === entry.id ? (
                       // Edit mode
                       <div className="space-y-3 p-4 bg-[var(--bg-surface)] rounded-lg border border-[var(--border-subtle)]">
-                        <input
-                          type="text"
-                          value={editing.label}
-                          onChange={(e) => setEditing({ ...editing, label: e.target.value })}
-                          placeholder="Label (e.g., Working on, Reading)"
-                          className="w-full px-3 py-2 bg-white/5 border border-[var(--border-subtle)] rounded text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
-                        />
+                        <div className="flex gap-3">
+                          <input
+                            type="date"
+                            value={editing.entryDate}
+                            onChange={(e) => setEditing({ ...editing, entryDate: e.target.value })}
+                            className="px-3 py-2 bg-white/5 border border-[var(--border-subtle)] rounded text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                          />
+                          <input
+                            type="text"
+                            value={editing.label}
+                            onChange={(e) => setEditing({ ...editing, label: e.target.value })}
+                            placeholder="Label (e.g., Working on, Reading)"
+                            className="flex-1 px-3 py-2 bg-white/5 border border-[var(--border-subtle)] rounded text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                          />
+                        </div>
                         <textarea
                           value={editing.text}
                           onChange={(e) => setEditing({ ...editing, text: e.target.value })}

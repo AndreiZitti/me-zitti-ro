@@ -7,6 +7,7 @@ export interface NowEntry {
   id: string;
   label: string;
   text: string;
+  entry_date: string;
   sort_order: number;
   created_at: string;
   updated_at: string;
@@ -17,6 +18,7 @@ export async function getEntries(): Promise<NowEntry[]> {
   const { data, error } = await supabase
     .from('now_entries')
     .select('*')
+    .order('entry_date', { ascending: false })
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -27,9 +29,9 @@ export async function getEntries(): Promise<NowEntry[]> {
   return data || [];
 }
 
-export async function createEntry(label: string, text: string): Promise<{ success: boolean; error?: string }> {
+export async function createEntry(label: string, text: string, entryDate: string): Promise<{ success: boolean; error?: string }> {
   const supabase = await createClient();
-  
+
   // Get the current user
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -47,7 +49,7 @@ export async function createEntry(label: string, text: string): Promise<{ succes
 
   const { error } = await supabase
     .from('now_entries')
-    .insert({ label, text, sort_order: nextOrder });
+    .insert({ label, text, entry_date: entryDate, sort_order: nextOrder });
 
   if (error) {
     console.error('Error creating entry:', error);
@@ -58,9 +60,9 @@ export async function createEntry(label: string, text: string): Promise<{ succes
   return { success: true };
 }
 
-export async function updateEntry(id: string, label: string, text: string): Promise<{ success: boolean; error?: string }> {
+export async function updateEntry(id: string, label: string, text: string, entryDate: string): Promise<{ success: boolean; error?: string }> {
   const supabase = await createClient();
-  
+
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return { success: false, error: 'Not authenticated' };
@@ -68,7 +70,7 @@ export async function updateEntry(id: string, label: string, text: string): Prom
 
   const { error } = await supabase
     .from('now_entries')
-    .update({ label, text, updated_at: new Date().toISOString() })
+    .update({ label, text, entry_date: entryDate, updated_at: new Date().toISOString() })
     .eq('id', id);
 
   if (error) {

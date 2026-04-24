@@ -1,8 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { NowEntry } from '@/app/now/actions';
 
-export default function WelcomePanel() {
+interface WelcomePanelProps {
+  latestNow: NowEntry | null;
+}
+
+function formatDateShort(iso: string): string {
+  const date = new Date(iso + 'T00:00:00');
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+export default function WelcomePanel({ latestNow }: WelcomePanelProps) {
   const [isBooted, setIsBooted] = useState(false);
 
   useEffect(() => {
@@ -13,7 +23,7 @@ export default function WelcomePanel() {
 
   return (
     <div
-      className="relative px-6 py-8 max-w-[320px] z-[1] opacity-0 mx-auto text-center lg:absolute lg:top-1/2 lg:left-12 lg:-translate-y-1/2 lg:mx-0 lg:text-left lg:px-0 lg:py-0"
+      className="relative px-6 py-8 max-w-[360px] z-[1] opacity-0 mx-auto text-center lg:absolute lg:top-1/2 lg:left-12 lg:-translate-y-1/2 lg:mx-0 lg:text-left lg:px-0 lg:py-0"
       style={{
         animation: `welcomeFadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards`,
         animationDelay: isBooted ? '0.1s' : '1.15s',
@@ -28,6 +38,21 @@ export default function WelcomePanel() {
       <p className="text-base text-text-secondary leading-relaxed mb-5">
         Feel free to explore the apps, and if you find bugs or have ideas, just reach out.
       </p>
+
+      {latestNow && (
+        <a
+          href="/now"
+          className="block border-l-2 border-[var(--border-hover)] pl-4 py-1 mb-5 no-underline transition-colors duration-fast hover:border-accent-primary group text-left"
+        >
+          <p className="text-[0.6875rem] uppercase tracking-wider text-text-muted mb-1">
+            Lately — {formatDateShort(latestNow.entry_date)}
+          </p>
+          <p className="text-[0.875rem] text-text-secondary leading-snug line-clamp-2 transition-colors duration-fast group-hover:text-text-primary">
+            <span className="text-text-primary font-medium">{latestNow.label}</span>
+            {latestNow.text ? ` — ${latestNow.text}` : ''}
+          </p>
+        </a>
+      )}
 
       <a
         href="https://projects.zitti.ro"
